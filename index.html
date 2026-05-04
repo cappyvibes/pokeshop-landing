@@ -1,30 +1,1177 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <title>PokeShop - wkrótce</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #0a0e1a;
-            color: #FFD700;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PokeLovers Gdynia – Sklep z Kartami Pokémon TCG</title>
+  <meta name="description" content="Sklep z kartami Pokémon TCG w Gdyni. Pojedyncze karty, ETB, boostery, akcesoria. Wkrótce otwieramy!" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- Lucide Icons – wektorowe SVG zamiast emoji -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy:    { DEFAULT: '#0a0e1a', 800: '#0f1526', 700: '#141c33', 600: '#1a2444', 500: '#1e2b52' },
+            gold:    { DEFAULT: '#f0c040', light: '#f7d96a', dark: '#c9962a', muted: '#8a6820' },
+            pokered: { DEFAULT: '#e03030', dark: '#b02020' },
+            silver:  { DEFAULT: '#c8d0e0', muted: '#6b7a99' },
+          },
+          fontFamily: {
+            heading: ['Rajdhani', 'sans-serif'],
+            body:    ['Crimson Pro', 'serif'],
+            mono:    ['Space Mono', 'monospace'],
+          },
         }
-        h1 {
-            font-size: 3rem;
-        }
-    </style>
+      }
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: #0a0e1a;
+      color: #c8d0e0;
+      font-family: 'Crimson Pro', serif;
+      font-size: 18px;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0a0e1a; }
+    ::-webkit-scrollbar-thumb { background: #f0c040; border-radius: 3px; }
+
+    .nav-link {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6b7a99;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: #f0c040; }
+
+    .hero-bg {
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(240,192,64,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 80% 20%, rgba(224,48,48,0.06) 0%, transparent 60%),
+        #0a0e1a;
+      position: relative;
+    }
+    .hero-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 15% 25%, rgba(240,192,64,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 40% 60%, rgba(200,208,224,0.3) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 70% 15%, rgba(240,192,64,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 85% 70%, rgba(200,208,224,0.25) 0%, transparent 100%),
+        radial-gradient(1px 1px at 25% 80%, rgba(240,192,64,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 40%, rgba(200,208,224,0.2) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 90% 45%, rgba(240,192,64,0.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 10% 55%, rgba(200,208,224,0.3) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .countdown-box {
+      background: rgba(240,192,64,0.08);
+      border: 1px solid rgba(240,192,64,0.25);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      min-width: 80px;
+      text-align: center;
+    }
+    .countdown-number {
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      color: #f0c040;
+      line-height: 1;
+      display: block;
+    }
+    .countdown-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #6b7a99;
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* ── Przyciski ── */
+    .btn-gold {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #f0c040;
+      color: #0a0e1a;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 14px 32px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      text-decoration: none;
+    }
+    .btn-gold:hover { background: #f7d96a; transform: translateY(-2px); }
+    .btn-gold:active { transform: translateY(0); }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: #f0c040;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 13px 32px;
+      border-radius: 8px;
+      border: 1.5px solid rgba(240,192,64,0.5);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      text-decoration: none;
+    }
+    .btn-outline:hover {
+      border-color: #f0c040;
+      background: rgba(240,192,64,0.08);
+      transform: translateY(-2px);
+    }
+
+    /* ─────────────────────────────────────────
+       KARTY PRODUKTÓW – pełny artwork + holo nakładka
+    ───────────────────────────────────────── */
+    .product-card {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      /* Proporcje prawdziwej karty Pokemon 2.5:3.5 */
+      aspect-ratio: 2.5 / 3.5;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(.22,.68,0,1.2), box-shadow 0.3s;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+      --mx: 50%;
+      --my: 50%;
+      --angle: 0deg;
+    }
+    .product-card:hover {
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.85);
+    }
+
+    /* Pełny artwork karty jako tło kafelka */
+    .card-full-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      z-index: 0;
+    }
+
+    /* Fallback emoji gdy obrazek nie załaduje */
+    .card-fallback {
+      display: none;
+      position: absolute; inset: 0; z-index: 0;
+      align-items: center; justify-content: center;
+      font-size: 4rem; opacity: 0.4;
+      background: #1a2444;
+    }
+
+    /* Warstwa holo – biały blask podąża za myszką */
+    .holo-layer {
+      position: absolute; inset: 0; z-index: 2; pointer-events: none;
+      opacity: 0; transition: opacity 0.3s;
+      background: radial-gradient(
+        300px circle at var(--mx) var(--my),
+        rgba(255,255,255,0.30) 0%,
+        rgba(255,255,255,0.08) 40%,
+        transparent 65%
+      );
+      mix-blend-mode: screen;
+    }
+    .product-card:hover .holo-layer { opacity: 1; }
+
+    /* Rainbow shimmer – tęcza obraca się po karcie */
+    .rainbow-layer {
+      position: absolute; inset: 0; z-index: 3; pointer-events: none;
+      opacity: 0; transition: opacity 0.3s;
+      background: linear-gradient(
+        calc(var(--angle) + 105deg),
+        transparent 15%,
+        rgba(255, 60, 60,  0.22) 25%,
+        rgba(255,200,  0,  0.22) 35%,
+        rgba( 60,255,120,  0.20) 45%,
+        rgba(  0,160,255,  0.22) 55%,
+        rgba(180,  0,255,  0.20) 65%,
+        transparent 75%
+      );
+      mix-blend-mode: color-dodge;
+    }
+    .product-card:hover .rainbow-layer { opacity: 1; }
+
+    /* Glitter – błyski w losowych miejscach */
+    .glitter-layer {
+      position: absolute; inset: 0; z-index: 4; pointer-events: none;
+      opacity: 0; transition: opacity 0.3s;
+      background-image:
+        radial-gradient(1.5px 1.5px at 18% 28%, rgba(255,255,255,0.95) 0%, transparent 100%),
+        radial-gradient(1px   1px   at 72% 14%, rgba(255,255,255,0.85) 0%, transparent 100%),
+        radial-gradient(2px   2px   at 48% 68%, rgba(255,255,255,0.75) 0%, transparent 100%),
+        radial-gradient(1px   1px   at 83% 52%, rgba(255,255,255,0.85) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 32% 82%, rgba(255,255,255,0.65) 0%, transparent 100%),
+        radial-gradient(1px   1px   at 9%  58%, rgba(255,255,255,0.75) 0%, transparent 100%),
+        radial-gradient(2px   2px   at 58% 38%, rgba(255,255,255,0.55) 0%, transparent 100%),
+        radial-gradient(1px   1px   at 91% 78%, rgba(255,255,255,0.85) 0%, transparent 100%);
+    }
+    .product-card:hover .glitter-layer { opacity: 1; }
+
+    /* Tęczowe obramowanie */
+    .holo-border {
+      position: absolute; inset: -1px; border-radius: 15px;
+      pointer-events: none; opacity: 0; transition: opacity 0.35s; z-index: 5;
+      background: conic-gradient(
+        from var(--angle) at 50% 50%,
+        rgba(255,80,80,.9), rgba(255,200,0,.9),
+        rgba(80,255,80,.9), rgba(0,180,255,.9),
+        rgba(180,0,255,.9), rgba(255,80,80,.9)
+      );
+      padding: 2px;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+    .product-card:hover .holo-border { opacity: 1; }
+
+    /* Ciemny gradient na dole – czytelność nazwy i ceny */
+    .card-info-grad {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 6;
+      background: linear-gradient(to top, rgba(4,7,18,0.97) 0%, rgba(4,7,18,0.80) 45%, transparent 100%);
+      padding: 1.5rem 0.9rem 0.8rem;
+    }
+
+    /* Odznaka rzadkości */
+    .rarity-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 7;
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(240,192,64,0.92);
+      color: #0a0e1a;
+    }
+    .rarity-badge.sir   { background: rgba(200,160,255,0.92); color: #1a0040; }
+    .rarity-badge.gx    { background: rgba(64,200,160,0.92);  color: #002a1a; }
+    .rarity-badge.ultra { background: rgba(64,160,240,0.92);  color: #001a40; }
+
+    /* Dolna część karty – dane i cena */
+    /* ── Sekcje ── */
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #f0c040;
+    }
+    .section-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: #e8eaf0;
+      line-height: 1.1;
+    }
+
+    /* ── Kategorie ── */
+    .category-card {
+      background: rgba(20,28,51,0.8);
+      border: 1px solid rgba(240,192,64,0.12);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    }
+    .category-card:hover {
+      border-color: rgba(240,192,64,0.35);
+      background: rgba(26,36,68,0.9);
+      transform: translateY(-4px);
+    }
+    .category-icon {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      background: rgba(240,192,64,0.1);
+      border: 1px solid rgba(240,192,64,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── FAQ ── */
+    .faq-item { border-bottom: 1px solid rgba(240,192,64,0.1); }
+    .faq-question {
+      width: 100%; display: flex; justify-content: space-between; align-items: center;
+      padding: 1.25rem 0; background: transparent; border: none; cursor: pointer;
+      text-align: left; font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 1.1rem; color: #c8d0e0; transition: color 0.2s; gap: 1rem;
+    }
+    .faq-question:hover { color: #f0c040; }
+    .faq-chevron {
+      flex-shrink: 0; width: 20px; height: 20px;
+      border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+      transform: rotate(45deg); transition: transform 0.3s; margin-top: -4px;
+    }
+    .faq-chevron.open { transform: rotate(-135deg); margin-top: 4px; }
+    .faq-answer { font-size: 1rem; color: #6b7a99; padding-bottom: 1.25rem; line-height: 1.7; }
+
+    /* ── Formularz ── */
+    .form-input {
+      width: 100%; background: rgba(20,28,51,0.8);
+      border: 1px solid rgba(240,192,64,0.15); border-radius: 10px;
+      padding: 14px 18px; color: #c8d0e0; font-family: 'Crimson Pro', serif;
+      font-size: 1rem; outline: none; transition: border-color 0.2s;
+    }
+    .form-input:focus { border-color: rgba(240,192,64,0.5); }
+    .form-input::placeholder { color: #3a4566; }
+    .form-label {
+      display: block; font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #6b7a99; margin-bottom: 8px;
+    }
+
+    /* ── Inne ── */
+    /* .sets-banner usunięty – zastąpiony inline stylem */
+    .divider { border: none; height: 1px; background: linear-gradient(to right, transparent, rgba(240,192,64,0.2), transparent); margin: 0; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.7s ease both; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.25s; }
+    .delay-3 { animation-delay: 0.4s; }
+    .delay-4 { animation-delay: 0.55s; }
+    .delay-5 { animation-delay: 0.7s; }
+
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    .logo-shimmer {
+      background: linear-gradient(90deg, #f0c040 0%, #ffffff 40%, #f0c040 60%, #c9962a 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 4s linear infinite;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+    @media (max-width: 640px) {
+      .products-grid { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
+      .countdown-box { padding: 0.75rem 1rem; min-width: 60px; }
+    }
+
+    /* ── Scroll-reveal ── */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ── Nav shrink ── */
+    .nav-shrunk .nav-inner { height: 52px !important; }
+    .nav-link.active { color: #f0c040 !important; }
+
+    /* ── Licznik flip ── */
+    .countdown-box { perspective: 300px; }
+    .countdown-number { display: inline-block; transition: transform 0.22s ease, opacity 0.22s ease; transform-origin: center bottom; }
+    .countdown-number.flip-out { transform: rotateX(90deg); opacity: 0; }
+
+    /* ── CTA pulse ── */
+    @keyframes pulse-gold {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(240,192,64,0.45); }
+      60%       { box-shadow: 0 0 0 14px rgba(240,192,64,0); }
+    }
+    .btn-pulse { animation: pulse-gold 2.8s ease infinite; }
+
+    /* ── Canvas cząsteczki ── */
+    #hero-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 0; width: 100%; height: 100%; }
+
+    /* ── Lucide ikony ── */
+    .cat-icon i[data-lucide] { color: #f0c040; display: block; width: 28px; height: 28px; }
+    .cat-icon svg { width: 28px !important; height: 28px !important; stroke: #f0c040; stroke-width: 1.75; fill: none; }
+    .info-icon i[data-lucide], .info-icon svg { width: 18px !important; height: 18px !important; stroke: #f0c040; stroke-width: 2; fill: none; flex-shrink: 0; margin-top: 2px; }
+    .btn-svg i[data-lucide], .btn-svg svg { width: 13px !important; height: 13px !important; stroke: currentColor; stroke-width: 2.5; fill: none; }
+    .social-svg i[data-lucide], .social-svg svg { width: 15px !important; height: 15px !important; stroke: currentColor; stroke-width: 2; fill: none; }
+
+    /* ── Gradient border na category card hover ── */
+    .category-card { position: relative; overflow: visible; }
+  </style>
 </head>
-<body>
-    <div>
-        <h1>PokeShop Gdynia</h1>
-        <p>Najlepsze karty Pokemon TCG w Trójmieście</p>
-        <p style="font-size: 1.2rem; margin-top: 2rem;">Otwarcie: grudzień 2026</p>
+
+<body x-data="{
+  mobileMenuOpen: false,
+  daysLeft: 0, hoursLeft: 0, minutesLeft: 0, secondsLeft: 0,
+  init() {
+    const target = new Date('2026-11-20T10:00:00');
+    const tick = () => {
+      const diff = target - new Date();
+      if (diff <= 0) { this.daysLeft = this.hoursLeft = this.minutesLeft = this.secondsLeft = 0; return; }
+      this.daysLeft    = Math.floor(diff / 86400000);
+      this.hoursLeft   = Math.floor((diff % 86400000) / 3600000);
+      this.minutesLeft = Math.floor((diff % 3600000) / 60000);
+      this.secondsLeft = Math.floor((diff % 60000) / 1000);
+    };
+    tick(); setInterval(tick, 1000);
+  }
+}">
+
+<!-- ── NAWIGACJA ── -->
+<nav class="fixed top-0 left-0 right-0 z-50" style="background: rgba(10,14,26,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(240,192,64,0.1);">
+  <div class="max-w-7xl mx-auto px-6 flex items-center justify-between h-16 nav-inner" style="transition: height 0.3s ease;">
+    <a href="#hero" class="font-heading font-bold text-2xl logo-shimmer" style="letter-spacing: 0.05em; text-decoration: none;">PokeLovers</a>
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#o-nas"    class="nav-link">O nas</a>
+      <a href="#oferta"   class="nav-link">Oferta</a>
+      <a href="#produkty" class="nav-link">Karty</a>
+      <a href="#faq"      class="nav-link">FAQ</a>
+      <a href="#kontakt"  class="nav-link">Kontakt</a>
     </div>
+    <a href="#kontakt" class="hidden md:inline-flex btn-gold" style="padding: 10px 22px; font-size: 13px; gap:6px;">
+      <span class="btn-svg"><i data-lucide="bookmark"></i></span> Zarezerwuj kartę
+    </a>
+    <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden flex flex-col gap-1.5 p-2" aria-label="Menu">
+      <span class="block w-6 h-0.5 bg-gold transition-all" :style="mobileMenuOpen ? 'transform: rotate(45deg) translateY(6px)' : ''"></span>
+      <span class="block w-6 h-0.5 bg-gold transition-all" :style="mobileMenuOpen ? 'opacity: 0' : ''"></span>
+      <span class="block w-6 h-0.5 bg-gold transition-all" :style="mobileMenuOpen ? 'transform: rotate(-45deg) translateY(-6px)' : ''"></span>
+    </button>
+  </div>
+  <div x-show="mobileMenuOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="md:hidden px-6 pb-6 flex flex-col gap-4" style="border-top: 1px solid rgba(240,192,64,0.1);">
+    <a href="#o-nas"    @click="mobileMenuOpen=false" class="nav-link pt-4">O nas</a>
+    <a href="#oferta"   @click="mobileMenuOpen=false" class="nav-link">Oferta</a>
+    <a href="#produkty" @click="mobileMenuOpen=false" class="nav-link">Karty</a>
+    <a href="#faq"      @click="mobileMenuOpen=false" class="nav-link">FAQ</a>
+    <a href="#kontakt"  @click="mobileMenuOpen=false" class="nav-link">Kontakt</a>
+    <a href="#kontakt"  @click="mobileMenuOpen=false" class="btn-gold mt-2 justify-center"><span class="btn-svg"><i data-lucide="bookmark"></i></span> Zarezerwuj kartę</a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero" class="hero-bg min-h-screen flex flex-col items-center justify-center text-center px-6 pt-16" style="position:relative;">
+  <canvas id="hero-canvas"></canvas>
+  <p class="section-label fade-up mb-6 delay-1">Gdynia · Wkrótce Otwieramy</p>
+  <h1 class="font-heading font-bold fade-up delay-2" style="font-size: clamp(3rem, 8vw, 6rem); color: #e8eaf0; line-height: 1.05; max-width: 900px; letter-spacing: -0.01em;">
+    Twoje centrum <span style="color: #f0c040;">Pokémon TCG</span> w Gdyni
+  </h1>
+  <p class="fade-up delay-3 mt-6 max-w-xl mx-auto" style="font-size: 1.25rem; color: #6b7a99; line-height: 1.6;">
+    Pojedyncze karty, ETB, boostery i akcesoria — dla kolekcjonerów i graczy, którzy traktują hobby poważnie.
+  </p>
+  <div class="fade-up delay-4 mt-12">
+    <p class="section-label mb-5" style="font-size: 10px;">Otwarcie za</p>
+    <div class="flex items-start gap-3 justify-center flex-wrap">
+      <div class="countdown-box"><span class="countdown-number" x-text="String(daysLeft).padStart(3,'0')">000</span><span class="countdown-label">dni</span></div>
+      <span class="countdown-number" style="padding-top: 0.8rem; color: rgba(240,192,64,0.4);">:</span>
+      <div class="countdown-box"><span class="countdown-number" x-text="String(hoursLeft).padStart(2,'0')">00</span><span class="countdown-label">godzin</span></div>
+      <span class="countdown-number" style="padding-top: 0.8rem; color: rgba(240,192,64,0.4);">:</span>
+      <div class="countdown-box"><span class="countdown-number" x-text="String(minutesLeft).padStart(2,'0')">00</span><span class="countdown-label">minut</span></div>
+      <span class="countdown-number" style="padding-top: 0.8rem; color: rgba(240,192,64,0.4);">:</span>
+      <div class="countdown-box"><span class="countdown-number" x-text="String(secondsLeft).padStart(2,'0')">00</span><span class="countdown-label">sekund</span></div>
+    </div>
+    <p class="mt-4" style="font-family: 'Rajdhani', sans-serif; font-size: 13px; color: #3a4566; letter-spacing: 0.15em; text-transform: uppercase;">20 listopada 2026</p>
+  </div>
+  <div class="fade-up delay-5 flex flex-wrap gap-4 justify-center mt-10">
+    <!-- POPRAWKA 1: emoji karty w obu przyciskach CTA -->
+    <a href="#kontakt" class="btn-gold btn-pulse" style="position:relative;z-index:1;">
+      <span class="btn-svg"><i data-lucide="bookmark"></i></span> Zarezerwuj kartę
+    </a>
+    <a href="#produkty" class="btn-outline" style="position:relative;z-index:1;">
+      <span class="btn-svg"><i data-lucide="sparkles"></i></span> Zobacz ofertę ↓
+    </a>
+  </div>
+  <div class="mt-20 mb-8 flex flex-col items-center gap-2 opacity-30">
+    <span style="font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #f0c040;">scroll</span>
+    <div style="width: 1px; height: 48px; background: linear-gradient(to bottom, #f0c040, transparent);"></div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── O NAS ── -->
+<section id="o-nas" class="max-w-7xl mx-auto px-6 py-24">
+  <div class="grid md:grid-cols-2 gap-16 items-center">
+    <div>
+      <p class="section-label mb-4">O nas</p>
+      <h2 class="section-title mb-8">Sklep stworzony<br/>przez kolekcjonera,<br/><span style="color: #f0c040;">dla kolekcjonerów</span></h2>
+      <p class="mb-6" style="color: #8a9ab8; font-size: 1.1rem;">
+        Pokémon TCG to nie tylko karty — to społeczność, emocje i historia. Rozumiemy to, bo sami łapiemy się na drżeniu rąk przy otwieraniu boostera.
+      </p>
+      <p style="color: #8a9ab8; font-size: 1.1rem;">
+        PokeLovers to sklep stacjonarny i online w samym sercu Gdyni, gdzie każda karta jest traktowana z należytą starannością — od przechowywania, przez opis stanu, aż po bezpieczną wysyłkę.
+      </p>
+      <div class="mt-8 flex flex-col gap-4">
+        <div class="flex items-center gap-4"><span style="width:8px;height:8px;border-radius:50%;background:#f0c040;flex-shrink:0;"></span><span style="color:#c8d0e0;">Specjalizacja: pojedyncze karty SIR, SAR, Full Art</span></div>
+        <div class="flex items-center gap-4"><span style="width:8px;height:8px;border-radius:50%;background:#f0c040;flex-shrink:0;"></span><span style="color:#c8d0e0;">Każda karta opisana stanem NM / LP / MP</span></div>
+        <div class="flex items-center gap-4"><span style="width:8px;height:8px;border-radius:50%;background:#f0c040;flex-shrink:0;"></span><span style="color:#c8d0e0;">Możliwość rezerwacji telefonicznej i mailowej</span></div>
+        <div class="flex items-center gap-4"><span style="width:8px;height:8px;border-radius:50%;background:#f0c040;flex-shrink:0;"></span><span style="color:#c8d0e0;">Ceny według Cardmarket + uczciwa marża</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="category-card" style="padding: 2.5rem;">
+        <div class="flex items-center gap-4 mb-8">
+          <div style="width:64px;height:64px;border-radius:50%;background:rgba(240,192,64,0.15);border:2px solid rgba(240,192,64,0.3);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:#f0c040;flex-shrink:0;">PL</div>
+          <div>
+            <p style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.1rem;color:#e8eaf0;">Właściciel PokeLovers</p>
+            <p style="font-size:0.9rem;color:#6b7a99;">Kolekcjoner od 2019 · Gdynia</p>
+          </div>
+        </div>
+        <blockquote style="font-style:italic;color:#8a9ab8;font-size:1.05rem;line-height:1.7;border-left:3px solid rgba(240,192,64,0.4);padding-left:1.25rem;margin-bottom:2rem;">
+          „Pamiętam ból gdy nie znalazłem Bubble Mew w żadnym sklepie w Trójmieście. Dlatego otwieram sklep, w którym sam chciałbym kupować."
+        </blockquote>
+        <div class="flex flex-col gap-3">
+          <div class="flex items-start gap-3"><span class="info-icon"><i data-lucide="map-pin"></i></span><span style="color:#8a9ab8;font-size:0.95rem;">Gdynia — dokładny adres wkrótce</span></div>
+          <div class="flex items-start gap-3"><span class="info-icon"><i data-lucide="store"></i></span><span style="color:#8a9ab8;font-size:0.95rem;">Sklep stacjonarny + sprzedaż online</span></div>
+          <div class="flex items-start gap-3"><span class="info-icon"><i data-lucide="calendar"></i></span><span style="color:#8a9ab8;font-size:0.95rem;">Otwarcie: 20 listopada 2026</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── OFERTA – 4 KATEGORIE ── -->
+<section id="oferta" class="max-w-7xl mx-auto px-6 py-24">
+  <div class="text-center mb-16">
+    <p class="section-label mb-4">Oferta</p>
+    <h2 class="section-title">Co znajdziesz<br/><span style="color: #f0c040;">u nas</span></h2>
+  </div>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+    <!-- Kategoria 1: Pojedyncze karty – ikona karty TCG -->
+    <div class="category-card reveal reveal-delay-1">
+      <div class="category-icon cat-icon">
+        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="2" width="17" height="24" rx="2.5" stroke="#f0c040" stroke-width="1.75"/>
+          <rect x="6.5" y="4.5" width="12" height="8" rx="1" stroke="#f0c040" stroke-width="1.3"/>
+          <line x1="6.5" y1="15.5" x2="18" y2="15.5" stroke="#f0c040" stroke-width="1.3" stroke-linecap="round"/>
+          <line x1="6.5" y1="18.5" x2="14" y2="18.5" stroke="#f0c040" stroke-width="1.3" stroke-linecap="round"/>
+          <line x1="6.5" y1="21.5" x2="11" y2="21.5" stroke="#f0c040" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3 style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.3rem;color:#e8eaf0;margin-bottom:0.75rem;">Pojedyncze karty</h3>
+      <p style="color:#6b7a99;font-size:0.95rem;line-height:1.65;">SIR, SAR, Full Art, Illustration Rare i wiele więcej. Każda z opisanym stanem i ceną rynkową.</p>
+    </div>
+
+    <!-- Kategoria 2: Elite Trainer Box – ikona pudełka ETB -->
+    <div class="category-card reveal reveal-delay-2">
+      <div class="category-icon cat-icon">
+        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 9h22v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" stroke="#f0c040" stroke-width="1.75"/>
+          <path d="M1 5h26v4H1z" stroke="#f0c040" stroke-width="1.75" stroke-linejoin="round"/>
+          <path d="M11 5V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="#f0c040" stroke-width="1.5"/>
+          <line x1="14" y1="9" x2="14" y2="25" stroke="#f0c040" stroke-width="1.3" stroke-dasharray="2.5 2"/>
+        </svg>
+      </div>
+      <h3 style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.3rem;color:#e8eaf0;margin-bottom:0.75rem;">Elite Trainer Box</h3>
+      <p style="color:#6b7a99;font-size:0.95rem;line-height:1.65;">ETB z najpopularniejszych setów. Sealed, nowe. Możliwość preorderu na nadchodzące sety.</p>
+    </div>
+
+    <!-- Kategoria 3: Boostery – ikona booster packa -->
+    <div class="category-card reveal reveal-delay-3">
+      <div class="category-icon cat-icon">
+        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 2h14l4 7v15a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9L7 2z" stroke="#f0c040" stroke-width="1.75" stroke-linejoin="round"/>
+          <line x1="3" y1="9" x2="25" y2="9" stroke="#f0c040" stroke-width="1.4"/>
+          <path d="M14 14l2.5 4h-5L14 14z" stroke="#f0c040" stroke-width="1.3" stroke-linejoin="round"/>
+          <line x1="10" y1="20" x2="18" y2="20" stroke="#f0c040" stroke-width="1.3" stroke-linecap="round"/>
+          <line x1="11.5" y1="23" x2="16.5" y2="23" stroke="#f0c040" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3 style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.3rem;color:#e8eaf0;margin-bottom:0.75rem;">Boostery</h3>
+      <p style="color:#6b7a99;font-size:0.95rem;line-height:1.65;">Pojedyncze paczki z aktualnych i starszych edycji. EN, JP i inne wersje językowe.</p>
+    </div>
+
+    <!-- Kategoria 4: Akcesoria – ikona card sleeve -->
+    <div class="category-card reveal reveal-delay-4">
+      <div class="category-icon cat-icon">
+        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Sleeve zewnętrzna -->
+          <rect x="4" y="2" width="20" height="25" rx="2.5" stroke="#f0c040" stroke-width="1.75"/>
+          <!-- Karta wewnątrz (gestrikowany) -->
+          <rect x="7" y="6" width="14" height="18" rx="1.5" stroke="#f0c040" stroke-width="1.2" stroke-dasharray="2.5 2"/>
+          <!-- Otwarcie na górze sleeve -->
+          <path d="M4 5.5 Q14 2.5 24 5.5" stroke="#f0c040" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3 style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.3rem;color:#e8eaf0;margin-bottom:0.75rem;">Akcesoria</h3>
+      <p style="color:#6b7a99;font-size:0.95rem;line-height:1.65;">Sleeves, topy, bindriny, pudełka do przechowywania. Wszystko czego karta potrzebuje.</p>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ══════════════════════════════════════════
+     SEKCJA PRODUKTÓW – POPRAWKA 2
+     Prawdziwe obrazki kart z Limitless CDN
+     + gradient tła adekwatny do każdej karty
+     + efekt holo rainbow podążający za myszką
+══════════════════════════════════════════ -->
+<section id="produkty" class="max-w-7xl mx-auto px-6 py-24">
+  <div class="text-center mb-16">
+    <p class="section-label mb-4">Przykładowe karty</p>
+    <h2 class="section-title">Wyróżnione<br/><span style="color: #f0c040;">perełki kolekcji</span></h2>
+    <p class="mt-4 max-w-lg mx-auto" style="color: #6b7a99; font-size: 1rem;">
+      Ceny orientacyjne wg Cardmarket (maj 2026). Aktualne stany i ceny zawsze na zapytanie.
+    </p>
+  </div>
+
+  <div class="products-grid">
+
+    <!-- ─── KARTA 1: Bubble Mew ─── -->
+    <div class="product-card" onmousemove="holoMove(event,this)" onmouseleave="holoLeave(this)">
+      <div class="holo-border"></div>
+      <img class="card-full-img" src="https://images.pokemontcg.io/sv4pt5/232_hires.png" alt="Bubble Mew ex" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+      <div class="card-fallback">🔮</div>
+      <div class="holo-layer"></div>
+      <div class="rainbow-layer"></div>
+      <div class="glitter-layer"></div>
+      <span class="rarity-badge sir">SAR</span>
+      <div class="card-info-grad">
+        <p style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:1px;">Bubble Mew ex</p>
+        <p style="font-size:0.72rem;color:rgba(255,255,255,0.5);font-family:'Space Mono',monospace;margin-bottom:0.6rem;">Paldean Fates #232</p>
+        <div class="flex items-center justify-between gap-2">
+          <span style="font-family:'Space Mono',monospace;font-size:0.85rem;color:#f0c040;font-weight:700;">~2 500 zł</span>
+          <a href="#kontakt" class="btn-gold" style="padding:6px 10px;font-size:9px;gap:3px;">🃏 Zarezerwuj</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── KARTA 2: Pikachu ex ─── -->
+    <div class="product-card" onmousemove="holoMove(event,this)" onmouseleave="holoLeave(this)">
+      <div class="holo-border"></div>
+      <img class="card-full-img" src="https://den-cards.pokellector.com/426/Pikachu-ex.ASC.276.60547.png" alt="Pikachu ex" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+      <div class="card-fallback">⚡</div>
+      <div class="holo-layer"></div>
+      <div class="rainbow-layer"></div>
+      <div class="glitter-layer"></div>
+      <span class="rarity-badge sir">SIR</span>
+      <div class="card-info-grad">
+        <p style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:1px;">Pikachu ex</p>
+        <p style="font-size:0.72rem;color:rgba(255,255,255,0.5);font-family:'Space Mono',monospace;margin-bottom:0.6rem;">Ascended Heroes #276</p>
+        <div class="flex items-center justify-between gap-2">
+          <span style="font-family:'Space Mono',monospace;font-size:0.85rem;color:#f0c040;font-weight:700;">~3 900 zł</span>
+          <a href="#kontakt" class="btn-gold" style="padding:6px 10px;font-size:9px;gap:3px;">🃏 Zarezerwuj</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── KARTA 3: Latias & Latios GX ─── -->
+    <div class="product-card" onmousemove="holoMove(event,this)" onmouseleave="holoLeave(this)">
+      <div class="holo-border"></div>
+      <img class="card-full-img" src="https://images.pokemontcg.io/sm9/170_hires.png" alt="Latias Latios GX" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+      <div class="card-fallback">🐉</div>
+      <div class="holo-layer"></div>
+      <div class="rainbow-layer"></div>
+      <div class="glitter-layer"></div>
+      <span class="rarity-badge ultra">TAG TEAM</span>
+      <div class="card-info-grad">
+        <p style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:1px;">Latias & Latios GX</p>
+        <p style="font-size:0.72rem;color:rgba(255,255,255,0.5);font-family:'Space Mono',monospace;margin-bottom:0.6rem;">Team Up #170 · Lovebirds</p>
+        <div class="flex items-center justify-between gap-2">
+          <span style="font-family:'Space Mono',monospace;font-size:0.85rem;color:#f0c040;font-weight:700;">~7 700 zł</span>
+          <a href="#kontakt" class="btn-gold" style="padding:6px 10px;font-size:9px;gap:3px;">🃏 Zarezerwuj</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── KARTA 4: Charizard ex ─── -->
+    <div class="product-card" onmousemove="holoMove(event,this)" onmouseleave="holoLeave(this)">
+      <div class="holo-border"></div>
+      <img class="card-full-img" src="https://images.pokemontcg.io/sv3pt5/199_hires.png" alt="Charizard ex" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+      <div class="card-fallback">🔥</div>
+      <div class="holo-layer"></div>
+      <div class="rainbow-layer"></div>
+      <div class="glitter-layer"></div>
+      <span class="rarity-badge sir">SIR</span>
+      <div class="card-info-grad">
+        <p style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:1px;">Charizard ex</p>
+        <p style="font-size:0.72rem;color:rgba(255,255,255,0.5);font-family:'Space Mono',monospace;margin-bottom:0.6rem;">Pokémon 151 #199</p>
+        <div class="flex items-center justify-between gap-2">
+          <span style="font-family:'Space Mono',monospace;font-size:0.85rem;color:#f0c040;font-weight:700;">~850 zł</span>
+          <a href="#kontakt" class="btn-gold" style="padding:6px 10px;font-size:9px;gap:3px;">🃏 Zarezerwuj</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── KARTA 5: Mega Gengar ex ─── -->
+    <div class="product-card" onmousemove="holoMove(event,this)" onmouseleave="holoLeave(this)">
+      <div class="holo-border"></div>
+      <img class="card-full-img" src="https://den-cards.pokellector.com/426/Mega-Gengar-ex.ASC.284.59738.png" alt="Mega Gengar ex" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+      <div class="card-fallback">👻</div>
+      <div class="holo-layer"></div>
+      <div class="rainbow-layer"></div>
+      <div class="glitter-layer"></div>
+      <span class="rarity-badge sir">SIR</span>
+      <div class="card-info-grad">
+        <p style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:1px;">Mega Gengar ex</p>
+        <p style="font-size:0.72rem;color:rgba(255,255,255,0.5);font-family:'Space Mono',monospace;margin-bottom:0.6rem;">Ascended Heroes #284</p>
+        <div class="flex items-center justify-between gap-2">
+          <span style="font-family:'Space Mono',monospace;font-size:0.85rem;color:#f0c040;font-weight:700;">~4 900 zł</span>
+          <a href="#kontakt" class="btn-gold" style="padding:6px 10px;font-size:9px;gap:3px;">🃏 Zarezerwuj</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── KARTA 6: Mega Dragonair ex ─── -->
+    <div class="product-card" onmousemove="holoMove(event,this)" onmouseleave="holoLeave(this)">
+      <div class="holo-border"></div>
+      <img class="card-full-img" src="https://den-cards.pokellector.com/426/Mega-Dragonite-ex.ASC.290.60323.png" alt="Mega Dragonair ex" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+      <div class="card-fallback">🌊</div>
+      <div class="holo-layer"></div>
+      <div class="rainbow-layer"></div>
+      <div class="glitter-layer"></div>
+      <span class="rarity-badge sir">SIR</span>
+      <div class="card-info-grad">
+        <p style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:1px;">Mega Dragonair ex</p>
+        <p style="font-size:0.72rem;color:rgba(255,255,255,0.5);font-family:'Space Mono',monospace;margin-bottom:0.6rem;">Ascended Heroes · SIR</p>
+        <div class="flex items-center justify-between gap-2">
+          <span style="font-family:'Space Mono',monospace;font-size:0.85rem;color:#f0c040;font-weight:700;">Zapytaj o cenę</span>
+          <a href="#kontakt" class="btn-gold" style="padding:6px 10px;font-size:9px;gap:3px;">🃏 Zarezerwuj</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="text-center mt-8" style="font-size:0.85rem;color:#3a4566;">
+    Powyższe karty to przykłady oferty. Pełna lista dostępna po otwarciu i w kontakcie bezpośrednim.
+  </p>
+</section>
+
+<hr class="divider" />
+
+<!-- ── NADCHODZĄCE SETY ── -->
+<section id="sety" class="max-w-7xl mx-auto px-6 py-20">
+  <div class="p-10 md:p-14" style="background:#0f1526; border-radius:20px;">
+    <div class="text-center mb-10">
+      <p class="section-label mb-3">Na radarze</p>
+      <h2 class="section-title">Nadchodzące<br/><span style="color: #f0c040;">premiery setów</span></h2>
+    </div>
+    <div class="grid sm:grid-cols-3 gap-6" style="align-items:stretch;">
+
+      <!-- ══ Destined Rivals ══ -->
+      <div style="border-radius:16px; overflow:hidden; background:#0d1220; border:1px solid rgba(200,208,224,0.12); display:flex; flex-direction:column; transition:transform 0.25s,border-color 0.25s,box-shadow 0.25s;" onmouseover="this.style.transform='translateY(-5px)';this.style.borderColor='rgba(200,208,224,0.3)';this.style.boxShadow='0 12px 40px rgba(0,0,0,0.5)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(200,208,224,0.12)';this.style.boxShadow=''">
+        <!-- Wachlarz kart -->
+        <div style="position:relative; height:160px; overflow:hidden; background:linear-gradient(160deg,#12193a 0%,#0d1220 100%);">
+          <!-- Karta lewa – Mewtwo ex -->
+          <img src="https://den-cards.pokellector.com/412/Ethans-Ho-Oh-ex.DRI.230.57487.png"
+               onerror="this.src='https://den-cards.pokellector.com/426/Team-Rockets-Mewtwo-ex.ASC.281.59726.png'"
+               style="position:absolute; height:145px; width:auto; bottom:-10px; left:10px; transform:rotate(-15deg); transform-origin:bottom center; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6); z-index:1;" />
+          <!-- Karta środkowa – Cynthia Garchomp ex – najwyżej -->
+          <img src="https://den-cards.pokellector.com/412/Cynthias-Garchomp-ex.DRI.232.57234.png"
+               onerror="this.src='https://den-cards.pokellector.com/426/Cynthias-Garchomp-ex.ASC.111.59526.png'"
+               style="position:absolute; height:155px; width:auto; bottom:-5px; left:50%; transform:translateX(-50%); border-radius:6px; box-shadow:0 4px 20px rgba(0,0,0,0.7); z-index:3;" />
+          <!-- Karta prawa – Ho-Oh ex -->
+          <img src="https://den-cards.pokellector.com/412/Team-Rockets-Mewtwo-ex.DRI.231.57254.png"
+               onerror="this.src='https://den-cards.pokellector.com/412/Team-Rockets-Mewtwo-ex.DRI.231.57254.png'"
+               style="position:absolute; height:145px; width:auto; bottom:-10px; right:10px; transform:rotate(15deg); transform-origin:bottom center; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6); z-index:1;" />
+          <!-- Gradient overlay dołu -->
+          <div style="position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(to top,#0d1220,transparent);z-index:4;"></div>
+        </div>
+        <!-- Info -->
+        <div style="padding:1.25rem 1.5rem 1.5rem; flex:1; display:flex; flex-direction:column; gap:0.5rem;">
+          <p style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#6b7a99;">Scarlet & Violet · Q2 2025</p>
+          <h4 style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.25rem;color:#c8d0e0;letter-spacing:0.02em;">Destined Rivals</h4>
+          <p style="font-size:0.85rem;color:#6b7a99;line-height:1.6;flex:1;">Team Rocket, Mewtwo ex i najlepsi rywale historii Pokémon. 240+ kart.</p>
+        </div>
+      </div>
+
+      <!-- ══ Ascended Heroes – wyróżniony ══ -->
+      <div style="border-radius:16px; overflow:hidden; background:#0d1220; border:2px solid rgba(240,192,64,0.45); display:flex; flex-direction:column; position:relative; box-shadow:0 0 30px rgba(240,192,64,0.1); transition:transform 0.25s,box-shadow 0.25s;" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 16px 50px rgba(240,192,64,0.2)'" onmouseout="this.style.transform='';this.style.boxShadow='0 0 30px rgba(240,192,64,0.1)'">
+        <!-- Badge -->
+        <div style="position:absolute;top:10px;right:10px;background:#f0c040;color:#0a0e1a;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:20px;z-index:10;">Dostępny</div>
+        <!-- Wachlarz kart -->
+        <div style="position:relative; height:160px; overflow:hidden; background:linear-gradient(160deg,#1a1500 0%,#0d1220 100%);">
+          <!-- Karta lewa – Mega Gengar ex -->
+          <img src="https://den-cards.pokellector.com/426/Mega-Gengar-ex.ASC.284.59738.png"
+               style="position:absolute; height:145px; width:auto; bottom:-10px; left:10px; transform:rotate(-15deg); transform-origin:bottom center; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6); z-index:1;" />
+          <!-- Karta środkowa – Pikachu ex SIR -->
+          <img src="https://den-cards.pokellector.com/426/Pikachu-ex.ASC.276.60547.png"
+               style="position:absolute; height:155px; width:auto; bottom:-5px; left:50%; transform:translateX(-50%); border-radius:6px; box-shadow:0 4px 24px rgba(240,192,64,0.3); z-index:3;" />
+          <!-- Karta prawa – Mega Dragonite ex -->
+          <img src="https://den-cards.pokellector.com/426/Mega-Dragonite-ex.ASC.290.60323.png"
+               style="position:absolute; height:145px; width:auto; bottom:-10px; right:10px; transform:rotate(15deg); transform-origin:bottom center; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6); z-index:1;" />
+          <div style="position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(to top,#0d1220,transparent);z-index:4;"></div>
+        </div>
+        <!-- Info -->
+        <div style="padding:1.25rem 1.5rem 1.5rem; flex:1; display:flex; flex-direction:column; gap:0.5rem;">
+          <p style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#f0c040;">Mega Evolution · sty 2026</p>
+          <h4 style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.25rem;color:#f0c040;letter-spacing:0.02em;">Ascended Heroes</h4>
+          <p style="font-size:0.85rem;color:#c8d0e0;line-height:1.6;flex:1;">Mega Evolution wraca w wielkim stylu. 295 kart, Mega Gengar ex chase card.</p>
+        </div>
+      </div>
+
+      <!-- ══ Chaos Rising – Nowy ══ -->
+      <div style="border-radius:16px; overflow:hidden; background:#0d1220; border:1px solid rgba(100,140,255,0.22); display:flex; flex-direction:column; position:relative; transition:transform 0.25s,border-color 0.25s,box-shadow 0.25s;" onmouseover="this.style.transform='translateY(-5px)';this.style.borderColor='rgba(100,140,255,0.5)';this.style.boxShadow='0 12px 40px rgba(80,100,255,0.15)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(100,140,255,0.22)';this.style.boxShadow=''">
+        <!-- Badge -->
+        <div style="position:absolute;top:10px;right:10px;background:linear-gradient(90deg,#4060f0,#8040c0);color:#fff;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:20px;z-index:10;">Nowy</div>
+        <!-- Wachlarz kart – Chaos Rising używa chase cards z pokemontcg.io -->
+        <div style="position:relative; height:160px; overflow:hidden; background:linear-gradient(160deg,#080e28 0%,#0d1220 100%);">
+          <!-- Karta lewa – Mega Pyroar ex (używamy placeholder z Limitlesstcg bo set nowy) -->
+          <img src="https://den-cards.pokellector.com/431/Mega-Pyroar-ex.CRI.15.61044.png"
+               onerror="this.style.opacity='0.3'"
+               style="position:absolute; height:145px; width:auto; bottom:-10px; left:10px; transform:rotate(-15deg); transform-origin:bottom center; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6); z-index:1;" />
+          <!-- Karta środkowa – Mega Greninja ex -->
+          <img src="https://den-cards.pokellector.com/431/Mega-Greninja-ex.CRI.22.61043.png"
+               onerror="this.style.opacity='0.3'"
+               style="position:absolute; height:155px; width:auto; bottom:-5px; left:50%; transform:translateX(-50%); border-radius:6px; box-shadow:0 4px 24px rgba(100,140,255,0.25); z-index:3;" />
+          <!-- Karta prawa – Mega Floette ex -->
+          <img src="https://den-cards.pokellector.com/431/Mega-Floette-ex.CRI.35.61042.png"
+               onerror="this.style.opacity='0.3'"
+               style="position:absolute; height:145px; width:auto; bottom:-10px; right:10px; transform:rotate(15deg); transform-origin:bottom center; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6); z-index:1;" />
+          <div style="position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(to top,#0d1220,transparent);z-index:4;"></div>
+        </div>
+        <!-- Info -->
+        <div style="padding:1.25rem 1.5rem 1.5rem; flex:1; display:flex; flex-direction:column; gap:0.5rem;">
+          <p style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#6480ff;">Mega Evolution · 22 maja 2026</p>
+          <h4 style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.25rem;color:#e8eaf0;letter-spacing:0.02em;">Chaos Rising</h4>
+          <p style="font-size:0.85rem;color:#6b7a99;line-height:1.6;flex:1;">Mega Greninja ex prowadzi chaos — 120+ kart, 6 SIR, 5 Mega ex.</p>
+        </div>
+      </div>
+
+    </div>
+    <div class="mt-10 max-w-md mx-auto text-center">
+      <p class="mb-4" style="color:#8a9ab8;font-size:0.95rem;">Zapisz się — informujemy o premierach, preorderach i dostępności kart:</p>
+      <form onsubmit="event.preventDefault(); alert('Dziękujemy! Dodaliśmy Cię do listy.');" class="flex gap-3 flex-wrap justify-center">
+        <input type="email" placeholder="twoj@email.pl" class="form-input" style="flex:1;min-width:200px;" />
+        <button type="submit" class="btn-gold" style="white-space:nowrap;">Zapisz się</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── FAQ ── -->
+<section id="faq" class="max-w-3xl mx-auto px-6 py-24"
+  x-data="{ open: null, toggle(i) { this.open = this.open === i ? null : i; } }">
+  <div class="text-center mb-14">
+    <p class="section-label mb-4">FAQ</p>
+    <h2 class="section-title">Często zadawane<br/><span style="color: #f0c040;">pytania</span></h2>
+  </div>
+  <div class="faq-item">
+    <button class="faq-question" @click="toggle(1)"><span>Kiedy sklep zostanie otwarty?</span><span class="faq-chevron" :class="{ open: open === 1 }"></span></button>
+    <div class="faq-answer" x-show="open === 1" x-transition>Planowane otwarcie to <strong style="color:#f0c040;">20 listopada 2026</strong>. Sklep będzie działać stacjonarnie w Gdyni oraz online. Zapisz się do newslettera, by dostać powiadomienie jako pierwszy.</div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-question" @click="toggle(2)"><span>Czy mogę zarezerwować kartę przed otwarciem?</span><span class="faq-chevron" :class="{ open: open === 2 }"></span></button>
+    <div class="faq-answer" x-show="open === 2" x-transition>Tak! Przyjmujemy rezerwacje już teraz. Wystarczy napisać przez formularz kontaktowy — opisz kartę, jej stan i swój budżet, a wrócimy najszybciej jak to możliwe.</div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-question" @click="toggle(3)"><span>Jak ustalacie ceny kart?</span><span class="faq-chevron" :class="{ open: open === 3 }"></span></button>
+    <div class="faq-answer" x-show="open === 3" x-transition>Bazujemy na aktualnych cenach rynkowych z Cardmarket (trend, low, avg). Nie spekulujemy cenami — zależy nam na uczciwych transakcjach dla obu stron.</div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-question" @click="toggle(4)"><span>Czy sprzedajecie karty japońskie?</span><span class="faq-chevron" :class="{ open: open === 4 }"></span></button>
+    <div class="faq-answer" x-show="open === 4" x-transition>Tak, w naszej ofercie znajdą się karty JP — szczególnie te, które nie ukazały się lub ukazały się dużo wcześniej w Japonii.</div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-question" @click="toggle(5)"><span>Czy wysyłacie karty poza Gdynię?</span><span class="faq-chevron" :class="{ open: open === 5 }"></span></button>
+    <div class="faq-answer" x-show="open === 5" x-transition>Oczywiście! Wysyłamy na terenie całej Polski (Poczta Polska, InPost, DPD). Droższe karty pakujemy w top loadery, perfect fity i kopertę bąbelkową — zawsze bezpiecznie.</div>
+  </div>
+  <div class="faq-item" style="border-bottom:none;">
+    <button class="faq-question" @click="toggle(6)"><span>Czy skupujecie karty od klientów?</span><span class="faq-chevron" :class="{ open: open === 6 }"></span></button>
+    <div class="faq-answer" x-show="open === 6" x-transition>Tak, planujemy skup kart kolekcjonerskich (NM/LP). Jeśli masz karty do sprzedania, napisz z opisem i zdjęciami — wycenimy uczciwie według Cardmarket i wrócimy w ciągu 24h.</div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── KONTAKT ── -->
+<section id="kontakt" class="max-w-7xl mx-auto px-6 py-24">
+  <div class="text-center mb-16">
+    <p class="section-label mb-4">Kontakt</p>
+    <h2 class="section-title">Napisz do nas,<br/><span style="color: #f0c040;">czekamy</span></h2>
+  </div>
+  <div class="grid md:grid-cols-2 gap-12">
+    <div>
+      <form onsubmit="event.preventDefault(); const btn=this.querySelector('[type=submit]'); btn.textContent='Wysłano! ✓'; btn.style.background='#3a8a60'; btn.disabled=true; setTimeout(()=>{btn.textContent='Wyślij wiadomość';btn.style.background='';btn.disabled=false;},3500);" class="flex flex-col gap-5">
+        <div class="grid sm:grid-cols-2 gap-5">
+          <div><label class="form-label">Imię</label><input type="text" class="form-input" placeholder="Twoje imię" required /></div>
+          <div><label class="form-label">Email</label><input type="email" class="form-input" placeholder="ty@email.pl" required /></div>
+        </div>
+        <div>
+          <label class="form-label">Temat</label>
+          <select class="form-input" style="cursor:pointer;">
+            <option value="" style="background:#141c33;">Wybierz temat</option>
+            <option value="rezerwacja" style="background:#141c33;">Rezerwacja karty</option>
+            <option value="wycena" style="background:#141c33;">Wycena / skup kart</option>
+            <option value="dostepnosc" style="background:#141c33;">Pytanie o dostępność</option>
+            <option value="preorder" style="background:#141c33;">Preorder setu / ETB</option>
+            <option value="inne" style="background:#141c33;">Inne</option>
+          </select>
+        </div>
+        <div><label class="form-label">Wiadomość</label><textarea class="form-input" rows="5" placeholder="Opisz kartę, jej stan, swój budżet lub zadaj pytanie..." style="resize:vertical;"></textarea></div>
+        <button type="submit" class="btn-gold" style="width:100%;justify-content:center;font-size:15px;padding:15px;">Wyślij wiadomość →</button>
+        <p style="font-size:0.8rem;color:#3a4566;text-align:center;">Odpowiadamy w ciągu 24 godzin · Formularz statyczny (demo)</p>
+      </form>
+    </div>
+    <div class="flex flex-col gap-6">
+      <div class="category-card">
+        <h3 style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.1rem;color:#e8eaf0;margin-bottom:1.25rem;">Dane kontaktowe</h3>
+        <div class="flex flex-col gap-4">
+          <div class="flex items-start gap-3"><span class="info-icon"><i data-lucide="mail"></i></span><div><p style="font-size:0.8rem;color:#6b7a99;font-family:'Rajdhani',sans-serif;letter-spacing:0.08em;text-transform:uppercase;">Email</p><p style="color:#c8d0e0;">kontakt@poke-lovers.pl</p></div></div>
+          <div class="flex items-start gap-3"><span class="info-icon"><i data-lucide="phone"></i></span><div><p style="font-size:0.8rem;color:#6b7a99;font-family:'Rajdhani',sans-serif;letter-spacing:0.08em;text-transform:uppercase;">Telefon</p><p style="color:#c8d0e0;">+48 123 456 789</p></div></div>
+          <div class="flex items-start gap-3"><span class="info-icon"><i data-lucide="map-pin"></i></span><div><p style="font-size:0.8rem;color:#6b7a99;font-family:'Rajdhani',sans-serif;letter-spacing:0.08em;text-transform:uppercase;">Adres</p><p style="color:#c8d0e0;">Gdynia, Trójmiasto<br/><span style="color:#6b7a99;font-size:0.85rem;">Dokładny adres wkrótce</span></p></div></div>
+          <div class="flex items-start gap-3"><span class="info-icon"><i data-lucide="clock"></i></span><div><p style="font-size:0.8rem;color:#6b7a99;font-family:'Rajdhani',sans-serif;letter-spacing:0.08em;text-transform:uppercase;">Godziny (po otwarciu)</p><p style="color:#c8d0e0;">Pon–Pt: 11:00–19:00<br/>Sob: 10:00–16:00</p></div></div>
+        </div>
+      </div>
+      <div class="category-card" style="padding:1.5rem;">
+        <h3 style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;color:#e8eaf0;margin-bottom:1rem;">Śledź nas</h3>
+        <div class="flex gap-3">
+          <a href="https://instagram.com" target="_blank" class="btn-outline" style="flex:1;justify-content:center;padding:10px;font-size:12px;gap:6px;"><span class="social-svg"><i data-lucide="instagram"></i></span> Instagram</a>
+          <a href="https://facebook.com" target="_blank" class="btn-outline" style="flex:1;justify-content:center;padding:10px;font-size:12px;gap:6px;"><span class="social-svg"><i data-lucide="facebook"></i></span> Facebook</a>
+        </div>
+      </div>
+      <div style="border-radius:16px;overflow:hidden;border:1px solid rgba(240,192,64,0.15);aspect-ratio:16/9;background:rgba(20,28,51,0.8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+        <span style="font-size:2.5rem;opacity:0.4;"><i data-lucide="map" style="width:48px;height:48px;stroke:#6b7a99;fill:none;"></i></span>
+        <p style="font-family:'Rajdhani',sans-serif;font-size:0.9rem;color:#3a4566;letter-spacing:0.08em;text-transform:uppercase;">Mapa Google — wkrótce</p>
+        <p style="font-size:0.8rem;color:#3a4566;">Adres zostanie podany przed otwarciem</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── STOPKA ── -->
+<footer style="background:#060910;border-top:1px solid rgba(240,192,64,0.1);">
+  <div class="max-w-7xl mx-auto px-6 py-12">
+    <div class="grid sm:grid-cols-3 gap-10 mb-10">
+      <div>
+        <p class="font-heading font-bold text-2xl logo-shimmer mb-3" style="letter-spacing:0.05em;">PokeLovers</p>
+        <p style="font-size:0.9rem;color:#6b7a99;line-height:1.65;">Sklep z kartami Pokémon TCG w Gdyni. Dla kolekcjonerów i graczy, którzy wiedzą czego szukają.</p>
+      </div>
+      <div>
+        <p style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#f0c040;margin-bottom:1rem;">Nawigacja</p>
+        <div class="flex flex-col gap-2">
+          <a href="#o-nas"    class="nav-link" style="font-size:13px;">O nas</a>
+          <a href="#oferta"   class="nav-link" style="font-size:13px;">Oferta</a>
+          <a href="#produkty" class="nav-link" style="font-size:13px;">Wyróżnione karty</a>
+          <a href="#faq"      class="nav-link" style="font-size:13px;">FAQ</a>
+          <a href="#kontakt"  class="nav-link" style="font-size:13px;">Kontakt</a>
+        </div>
+      </div>
+      <div>
+        <p style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#f0c040;margin-bottom:1rem;">Kontakt</p>
+        <div class="flex flex-col gap-2">
+          <p style="font-size:0.88rem;color:#6b7a99;">kontakt@poke-lovers.pl</p>
+          <p style="font-size:0.88rem;color:#6b7a99;">+48 123 456 789</p>
+          <p style="font-size:0.88rem;color:#6b7a99;">Gdynia, Trójmiasto</p>
+        </div>
+        <div class="flex gap-3 mt-4">
+          <a href="https://instagram.com" target="_blank" class="nav-link" style="font-size:12px;">Instagram</a>
+          <span style="color:#3a4566;">·</span>
+          <a href="https://facebook.com" target="_blank" class="nav-link" style="font-size:12px;">Facebook</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(240,192,64,0.08);padding-top:1.5rem;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;">
+      <p style="font-size:0.8rem;color:#3a4566;">© 2026 PokeLovers Gdynia. Wszelkie prawa zastrzeżone.</p>
+      <p style="font-size:0.8rem;color:#3a4566;">Pokémon i Pokémon TCG są znakami towarowymi The Pokémon Company.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT – wszystkie efekty wizualne
+══════════════════════════════════════════ -->
+<script>
+  /* ── 1. Lucide – inicjalizacja ikon SVG ── */
+  lucide.createIcons();
+
+  /* ── 2. Holo efekt na kartach ── */
+  function holoMove(e, card) {
+    const r  = card.getBoundingClientRect();
+    const mx = ((e.clientX - r.left) / r.width  * 100).toFixed(1) + '%';
+    const my = ((e.clientY - r.top)  / r.height * 100).toFixed(1) + '%';
+    card.style.setProperty('--mx', mx);
+    card.style.setProperty('--my', my);
+  }
+  function holoLeave(card) {
+    card.style.setProperty('--mx', '50%');
+    card.style.setProperty('--my', '50%');
+  }
+  let angle = 0;
+  function animateAngle() {
+    angle = (angle + 0.6) % 360;
+    document.querySelectorAll('.product-card').forEach(c => {
+      c.style.setProperty('--angle', angle + 'deg');
+    });
+    requestAnimationFrame(animateAngle);
+  }
+  animateAngle();
+
+  /* ── 3. Nawigacja – shrink po scrollu + aktywna sekcja ── */
+  const navEl = document.querySelector('nav');
+  const navInner = document.querySelector('.nav-inner');
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  window.addEventListener('scroll', () => {
+    /* Shrink */
+    if (window.scrollY > 60) {
+      navEl.style.background = 'rgba(10,14,26,0.98)';
+      navEl.style.borderBottomColor = 'rgba(240,192,64,0.2)';
+      navEl.style.boxShadow = '0 2px 20px rgba(0,0,0,0.4)';
+      if (navInner) navInner.style.height = '52px';
+    } else {
+      navEl.style.background = 'rgba(10,14,26,0.92)';
+      navEl.style.borderBottomColor = 'rgba(240,192,64,0.1)';
+      navEl.style.boxShadow = 'none';
+      if (navInner) navInner.style.height = '64px';
+    }
+
+    /* Aktywna sekcja */
+    let current = '';
+    sections.forEach(sec => {
+      if (window.scrollY >= sec.offsetTop - 120) current = sec.id;
+    });
+    navLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  }, { passive: true });
+
+  /* ── 4. Scroll-reveal – Intersection Observer ── */
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  /* ── 5. Licznik z animacją flip cyfr ── */
+  const target = new Date('2026-11-20T10:00:00');
+  const nums = {
+    d: document.querySelector('[x-text*="daysLeft"]'),
+    h: document.querySelector('[x-text*="hoursLeft"]'),
+    m: document.querySelector('[x-text*="minutesLeft"]'),
+    s: document.querySelector('[x-text*="secondsLeft"]'),
+  };
+  /* Flip animacja gdy cyfra się zmienia */
+  function flipUpdate(el, newVal) {
+    if (!el || el.textContent === newVal) return;
+    el.classList.add('flip-out');
+    setTimeout(() => {
+      el.textContent = newVal;
+      el.classList.remove('flip-out');
+    }, 220);
+  }
+  /* Nadpisujemy tick Alpine żeby dodać flip */
+  setInterval(() => {
+    const diff = target - new Date();
+    if (diff <= 0) return;
+    const d = String(Math.floor(diff / 86400000)).padStart(3, '0');
+    const h = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0');
+    const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+    const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+    flipUpdate(nums.d, d);
+    flipUpdate(nums.h, h);
+    flipUpdate(nums.m, m);
+    flipUpdate(nums.s, s);
+  }, 1000);
+
+  /* ── 6. Cząsteczki hero (canvas) ── */
+  const canvas = document.getElementById('hero-canvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+
+    function resize() {
+      W = canvas.width  = canvas.offsetWidth;
+      H = canvas.height = canvas.offsetHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+
+    /* Tworzymy 55 cząsteczek */
+    for (let i = 0; i < 55; i++) {
+      particles.push({
+        x: Math.random() * 1000,
+        y: Math.random() * 800,
+        r: Math.random() * 1.8 + 0.4,
+        vx: (Math.random() - 0.5) * 0.25,
+        vy: (Math.random() - 0.5) * 0.25,
+        alpha: Math.random() * 0.6 + 0.2,
+        /* złote lub srebrne */
+        gold: Math.random() > 0.4,
+      });
+    }
+
+    function drawParticles() {
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        /* Zawijanie za krawędź */
+        if (p.x < 0) p.x = W;
+        if (p.x > W) p.x = 0;
+        if (p.y < 0) p.y = H;
+        if (p.y > H) p.y = 0;
+        /* Pulsowanie alpha */
+        p.alpha += Math.sin(Date.now() * 0.001 + p.x) * 0.005;
+        p.alpha = Math.max(0.1, Math.min(0.8, p.alpha));
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.gold
+          ? `rgba(240,192,64,${p.alpha})`
+          : `rgba(200,208,224,${p.alpha * 0.6})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+  }
+
+  /* ── 7. Reveal klasy na sekcje – dodajemy przez JS ── */
+  document.querySelectorAll('section > .text-center').forEach(el => {
+    el.classList.add('reveal');
+  });
+</script>
+
 </body>
 </html>
