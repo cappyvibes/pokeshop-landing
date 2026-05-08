@@ -46,9 +46,19 @@
       line-height: 1.65;
       overflow-x: hidden;
     }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #0a0e1a; }
-    ::-webkit-scrollbar-thumb { background: #f0c040; border-radius: 3px; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track {
+      background: #060910;
+      border-left: 1px solid rgba(240,192,64,0.06);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(to bottom, #c8900a, #f0c040, #c8900a);
+      border-radius: 4px;
+      border: 1px solid rgba(240,192,64,0.3);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(to bottom, #f0c040, #fffacd, #f0c040);
+    }
 
     .nav-link {
       font-family: 'Rajdhani', sans-serif;
@@ -58,8 +68,25 @@
       text-transform: uppercase;
       color: #6b7a99;
       transition: color 0.2s;
+      position: relative;
+      padding-bottom: 2px;
+      text-decoration: none;
+    }
+    /* Podkreślenie animowane od lewej do prawej */
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 1.5px;
+      background: #f0c040;
+      transition: width 0.3s ease;
+      border-radius: 1px;
     }
     .nav-link:hover { color: #f0c040; }
+    .nav-link:hover::after { width: 100%; }
+    .nav-link.active::after { width: 100%; }
 
     .hero-bg {
       background:
@@ -126,11 +153,15 @@
       border-radius: 8px;
       border: none;
       cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
+      transition: background 0.2s, transform 0.2s ease, box-shadow 0.2s ease;
       text-decoration: none;
     }
-    .btn-gold:hover { background: #f7d96a; transform: translateY(-2px); }
-    .btn-gold:active { transform: translateY(0); }
+    .btn-gold:hover {
+      background: #f7d96a;
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 24px rgba(240,192,64,0.45), 0 0 40px rgba(240,192,64,0.2);
+    }
+    .btn-gold:active { transform: translateY(0) scale(1); box-shadow: none; }
 
     .btn-outline {
       display: inline-flex;
@@ -147,14 +178,16 @@
       border-radius: 8px;
       border: 1.5px solid rgba(240,192,64,0.5);
       cursor: pointer;
-      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s ease, box-shadow 0.2s ease;
       text-decoration: none;
     }
     .btn-outline:hover {
       border-color: #f0c040;
       background: rgba(240,192,64,0.08);
-      transform: translateY(-2px);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 4px 20px rgba(240,192,64,0.25), 0 0 30px rgba(240,192,64,0.1);
     }
+    .btn-outline:active { transform: translateY(0) scale(1); box-shadow: none; }
 
     /* ─────────────────────────────────────────
        KARTY PRODUKTÓW – pełny artwork + holo nakładka
@@ -166,15 +199,23 @@
       /* Proporcje prawdziwej karty Pokemon 2.5:3.5 */
       aspect-ratio: 2.5 / 3.5;
       cursor: pointer;
-      transition: transform 0.3s cubic-bezier(.22,.68,0,1.2), box-shadow 0.3s;
+      transition:
+        transform 0.3s cubic-bezier(.22,.68,0,1.2),
+        box-shadow 0.3s ease,
+        outline-color 0.25s ease;
       box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+      outline: 1.5px solid rgba(255,255,255,0.05);
       --mx: 50%;
       --my: 50%;
       --angle: 0deg;
     }
     .product-card:hover {
       transform: translateY(-8px) scale(1.03);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.85);
+      box-shadow:
+        0 24px 60px rgba(0,0,0,0.85),
+        0 0 0 1.5px rgba(240,192,64,0.5),
+        0 0 35px rgba(240,192,64,0.15);
+      outline: none;
     }
 
     /* Pełny artwork karty jako tło kafelka */
@@ -365,6 +406,35 @@
     /* .sets-banner usunięty – zastąpiony inline stylem */
     .divider { border: none; height: 1px; background: linear-gradient(to right, transparent, rgba(240,192,64,0.2), transparent); margin: 0; }
 
+    /* ── Animowana karta hero ── */
+    @keyframes heroFloat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50%       { transform: translateY(-16px) rotate(1deg); }
+    }
+    @keyframes holoShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes sparkle {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50%       { opacity: 1.0; transform: scale(1.3); }
+    }
+    #hero-holo-card.is-tilting {
+      animation-play-state: paused;
+    }
+    @media (max-width: 768px) {
+      #hero > .max-w-7xl > div {
+        grid-template-columns: 1fr !important;
+        gap: 2.5rem !important;
+        text-align: center;
+      }
+      #hero-card-wrap { order: 2; }
+      #hero > .max-w-7xl > div > div:first-child { order: 1; }
+      #hero-holo-card { width: 180px !important; }
+      #hero > .max-w-7xl > div > div:first-child .flex { justify-content: center; }
+    }
+
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(24px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -387,6 +457,13 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
       animation: shimmer 4s linear infinite;
+      display: inline-block;
+      transition: transform 0.3s ease;
+      text-decoration: none;
+    }
+    /* Logo obraca się przy hover o 5 stopni */
+    .logo-shimmer:hover {
+      transform: rotate(5deg) scale(1.05);
     }
 
     .products-grid {
@@ -441,13 +518,47 @@
     .filter-btn.active { background: rgba(240,192,64,0.12); border-color: #f0c040; color: #f0c040; }
     .product-card.hidden-card { display: none !important; }
 
-    /* ── Scroll-reveal ── */
-    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
+    /* ── Scroll-reveal – fade in + slide up ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* Opóźnienia dla kart kategorii */
     .reveal-delay-1 { transition-delay: 0.1s; }
     .reveal-delay-2 { transition-delay: 0.2s; }
     .reveal-delay-3 { transition-delay: 0.3s; }
     .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* Animacja sekcji – subtelniejsza */
+    .section-reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .section-reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Stagger karty produktów */
+    .product-card {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .product-card.card-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* Zachowaj hover transform gdy widoczna */
+    .product-card.card-visible:hover {
+      transform: translateY(-8px) scale(1.03);
+    }
 
     /* ── Nav shrink ── */
     .nav-shrunk .nav-inner { height: 52px !important; }
@@ -528,47 +639,201 @@
 </nav>
 
 <!-- ── HERO ── -->
-<section id="hero" class="hero-bg min-h-screen flex flex-col items-center justify-center text-center px-6 pt-16" style="position:relative;">
+<section id="hero" class="hero-bg min-h-screen flex flex-col justify-center px-6 pt-20 pb-12" style="position:relative;">
   <canvas id="hero-canvas"></canvas>
-  <p class="section-label fade-up mb-6 delay-1">Gdynia · Wkrótce Otwieramy</p>
-  <h1 class="font-heading font-bold fade-up delay-2" style="font-size: clamp(3rem, 8vw, 6rem); color: #e8eaf0; line-height: 1.05; max-width: 900px; letter-spacing: -0.01em;">
-    Twoje centrum <span style="color: #f0c040;">Pokémon TCG</span> w Gdyni
-  </h1>
-  <p class="fade-up delay-3 mt-6 max-w-xl mx-auto" style="font-size: 1.25rem; color: #6b7a99; line-height: 1.6;">
-    Pojedyncze karty, ETB, boostery i akcesoria — dla kolekcjonerów i graczy, którzy traktują hobby poważnie.
-  </p>
-  <div class="fade-up delay-4 mt-12">
-    <p class="section-label mb-5" style="font-size: 10px;">Otwarcie za</p>
-    <div class="flex items-start gap-3 justify-center flex-wrap">
-      <div class="countdown-box"><span class="countdown-number" x-text="String(daysLeft).padStart(3,'0')">000</span><span class="countdown-label">dni</span></div>
-      <span class="countdown-number" style="padding-top: 0.8rem; color: rgba(240,192,64,0.4);">:</span>
-      <div class="countdown-box"><span class="countdown-number" x-text="String(hoursLeft).padStart(2,'0')">00</span><span class="countdown-label">godzin</span></div>
-      <span class="countdown-number" style="padding-top: 0.8rem; color: rgba(240,192,64,0.4);">:</span>
-      <div class="countdown-box"><span class="countdown-number" x-text="String(minutesLeft).padStart(2,'0')">00</span><span class="countdown-label">minut</span></div>
-      <span class="countdown-number" style="padding-top: 0.8rem; color: rgba(240,192,64,0.4);">:</span>
-      <div class="countdown-box"><span class="countdown-number" x-text="String(secondsLeft).padStart(2,'0')">00</span><span class="countdown-label">sekund</span></div>
-    </div>
-    <p class="mt-4" style="font-family: 'Rajdhani', sans-serif; font-size: 13px; color: #3a4566; letter-spacing: 0.15em; text-transform: uppercase;">20 listopada 2026</p>
-  </div>
-  <div class="fade-up delay-5 flex flex-wrap gap-4 justify-center mt-10">
-    <!-- POPRAWKA 1: emoji karty w obu przyciskach CTA -->
-    <a href="#sety" class="btn-gold btn-pulse" style="position:relative;z-index:1;">
-      <span class="btn-svg"><i data-lucide="bell"></i></span> Zapisz się na otwarcie
-    </a>
-    <a href="#produkty" class="btn-outline" style="position:relative;z-index:1;">
-      <span class="btn-svg"><i data-lucide="sparkles"></i></span> Zobacz ofertę ↓
-    </a>
-  </div>
-  <div class="mt-20 mb-8 flex flex-col items-center gap-2 opacity-30">
-    <span style="font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #f0c040;">scroll</span>
-    <div style="width: 1px; height: 48px; background: linear-gradient(to bottom, #f0c040, transparent);"></div>
+
+  <!-- Dwukolumnowy layout: tekst + karta -->
+  <div class="max-w-7xl mx-auto w-full" style="position:relative; z-index:1;">
+    <div style="display:grid; grid-template-columns: 1fr auto; gap: 4rem; align-items: center;">
+
+      <!-- LEWA: tekst, licznik, CTA -->
+      <div>
+        <p class="section-label fade-up mb-5 delay-1">Gdynia · Wkrótce Otwieramy</p>
+
+        <h1 class="font-heading font-bold fade-up delay-2"
+            style="font-size: clamp(2.6rem, 6vw, 5.2rem); color: #e8eaf0; line-height: 1.05; letter-spacing: -0.01em;">
+          Twoje centrum<br/><span style="color: #f0c040;">Pokémon TCG</span><br/>w Gdyni
+        </h1>
+
+        <p class="fade-up delay-3 mt-5"
+           style="font-size: 1.15rem; color: #6b7a99; line-height: 1.65; max-width: 480px;">
+          Pojedyncze karty, ETB, boostery i akcesoria — dla kolekcjonerów i graczy, którzy traktują hobby poważnie.
+        </p>
+
+        <!-- Licznik -->
+        <div class="fade-up delay-4 mt-10">
+          <p class="section-label mb-4" style="font-size: 10px;">Otwarcie za</p>
+          <div class="flex items-start gap-3 flex-wrap">
+            <div class="countdown-box"><span class="countdown-number" x-text="String(daysLeft).padStart(3,'0')">000</span><span class="countdown-label">dni</span></div>
+            <span class="countdown-number" style="padding-top: 0.8rem; color: rgba(240,192,64,0.4);">:</span>
+            <div class="countdown-box"><span class="countdown-number" x-text="String(hoursLeft).padStart(2,'0')">00</span><span class="countdown-label">godzin</span></div>
+            <span class="countdown-number" style="padding-top: 0.8rem; color: rgba(240,192,64,0.4);">:</span>
+            <div class="countdown-box"><span class="countdown-number" x-text="String(minutesLeft).padStart(2,'0')">00</span><span class="countdown-label">minut</span></div>
+            <span class="countdown-number" style="padding-top: 0.8rem; color: rgba(240,192,64,0.4);">:</span>
+            <div class="countdown-box"><span class="countdown-number" x-text="String(secondsLeft).padStart(2,'0')">00</span><span class="countdown-label">sekund</span></div>
+          </div>
+          <p class="mt-3" style="font-family:'Rajdhani',sans-serif; font-size:12px; color:#3a4566; letter-spacing:0.15em; text-transform:uppercase;">20 listopada 2026</p>
+        </div>
+
+        <!-- CTA -->
+        <div class="fade-up delay-5 flex flex-wrap gap-4 mt-8">
+          <a href="#sety" class="btn-gold btn-pulse">
+            <span class="btn-svg"><i data-lucide="bell"></i></span> Zapisz się na otwarcie
+          </a>
+          <a href="#produkty" class="btn-outline">
+            <span class="btn-svg"><i data-lucide="sparkles"></i></span> Zobacz ofertę ↓
+          </a>
+        </div>
+      </div>
+
+      <!-- PRAWA: animowana karta holograficzna -->
+      <div class="fade-up delay-3" id="hero-card-wrap"
+           style="display:flex; align-items:center; justify-content:center;">
+        <div id="hero-holo-card"
+             style="
+               width: 260px;
+               aspect-ratio: 2.5 / 3.5;
+               border-radius: 16px;
+               position: relative;
+               cursor: pointer;
+               transform-style: preserve-3d;
+               /* Floating animation */
+               animation: heroFloat 3s ease-in-out infinite;
+               box-shadow:
+                 0 20px 60px rgba(0,0,0,0.6),
+                 0 0 40px rgba(240,192,64,0.15);
+             ">
+
+          <!-- Holograficzny gradient – przesuwa się w pętli -->
+          <div id="hero-holo-inner" style="
+            width: 100%; height: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            background:
+              linear-gradient(
+                135deg,
+                #0a0e1a 0%,
+                #141c33 30%,
+                #0f1526 60%,
+                #0a0e1a 100%
+              );
+            border: 1px solid rgba(240,192,64,0.2);
+          ">
+
+            <!-- Warstwa holo rainbow – przesuwa się -->
+            <div id="hero-rainbow" style="
+              position: absolute; inset: 0;
+              background: linear-gradient(
+                125deg,
+                rgba(255,0,128,   0.55) 0%,
+                rgba(255,80,0,    0.50) 14%,
+                rgba(255,200,0,   0.55) 28%,
+                rgba(0,220,80,    0.50) 42%,
+                rgba(0,180,255,   0.55) 56%,
+                rgba(100,0,255,   0.50) 70%,
+                rgba(220,0,220,   0.55) 84%,
+                rgba(255,0,128,   0.50) 100%
+              );
+              background-size: 300% 300%;
+              animation: holoShift 4s linear infinite;
+              mix-blend-mode: color-dodge;
+              border-radius: 16px;
+            "></div>
+
+            <!-- Subtelne linie shimmer -->
+            <div style="
+              position: absolute; inset: 0;
+              background: repeating-linear-gradient(
+                90deg,
+                transparent 0px,
+                transparent 3px,
+                rgba(255,255,255,0.03) 3px,
+                rgba(255,255,255,0.03) 4px
+              );
+              border-radius: 16px;
+            "></div>
+
+            <!-- Centralny symbol Pokeball -->
+            <div style="
+              position: absolute;
+              top: 50%; left: 50%;
+              transform: translate(-50%, -60%);
+              width: 110px; height: 110px;
+              border-radius: 50%;
+              border: 3px solid rgba(240,192,64,0.35);
+              display: flex; align-items: center; justify-content: center;
+            ">
+              <div style="
+                width: 80px; height: 80px;
+                border-radius: 50%;
+                border: 2px solid rgba(240,192,64,0.25);
+                display: flex; align-items: center; justify-content: center;
+              ">
+                <!-- Pokeball uproszczony SVG -->
+                <svg viewBox="0 0 60 60" width="54" height="54" style="opacity:0.3;">
+                  <circle cx="30" cy="30" r="28" fill="none" stroke="#f0c040" stroke-width="2"/>
+                  <line x1="2" y1="30" x2="58" y2="30" stroke="#f0c040" stroke-width="2"/>
+                  <circle cx="30" cy="30" r="8" fill="none" stroke="#f0c040" stroke-width="2"/>
+                  <circle cx="30" cy="30" r="4" fill="rgba(240,192,64,0.4)"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Logo PokeLovers na dole karty -->
+            <div style="
+              position: absolute; bottom: 0; left: 0; right: 0;
+              padding: 1.5rem 1.25rem 1rem;
+              background: linear-gradient(to top, rgba(10,14,26,0.95) 0%, transparent 100%);
+              text-align: center;
+            ">
+              <p style="font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1.1rem;
+                         background: linear-gradient(90deg,#f0c040,#fff,#f0c040);
+                         background-size: 200% auto;
+                         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+                         background-clip: text;
+                         animation: shimmer 3s linear infinite;">
+                PokeLovers
+              </p>
+              <p style="font-family:'Space Mono',monospace; font-size:9px; color:rgba(240,192,64,0.5); letter-spacing:0.15em; margin-top:2px;">
+                GDYNIA · 2026
+              </p>
+            </div>
+
+            <!-- Błysk w rogu -->
+            <div style="
+              position: absolute; top: 12px; right: 14px;
+              width: 6px; height: 6px; border-radius: 50%;
+              background: rgba(255,255,255,0.9);
+              box-shadow: 0 0 8px rgba(255,255,255,0.8);
+              animation: sparkle 2s ease-in-out infinite;
+            "></div>
+            <div style="
+              position: absolute; top: 30px; left: 18px;
+              width: 4px; height: 4px; border-radius: 50%;
+              background: rgba(255,215,0,0.8);
+              box-shadow: 0 0 6px rgba(255,215,0,0.6);
+              animation: sparkle 2s ease-in-out infinite 0.7s;
+            "></div>
+
+          </div><!-- /hero-holo-inner -->
+        </div><!-- /hero-holo-card -->
+      </div><!-- /hero-card-wrap -->
+
+    </div><!-- /grid -->
+  </div><!-- /max-w -->
+
+  <!-- Scroll hint -->
+  <div class="mt-12 mb-4 flex flex-col items-center gap-2 opacity-30" style="position:relative;z-index:1;">
+    <span style="font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:#f0c040;">scroll</span>
+    <div style="width:1px; height:48px; background:linear-gradient(to bottom,#f0c040,transparent);"></div>
   </div>
 </section>
 
 <hr class="divider" />
 
 <!-- ── O NAS ── -->
-<section id="o-nas" class="max-w-7xl mx-auto px-6 py-24">
+<section id="o-nas" class="max-w-7xl mx-auto px-6 py-24 section-reveal">
   <div class="grid md:grid-cols-2 gap-16 items-center">
     <div>
       <p class="section-label mb-4">O nas</p>
@@ -611,7 +876,7 @@
 <hr class="divider" />
 
 <!-- ── OFERTA – 4 KATEGORIE ── -->
-<section id="oferta" class="max-w-7xl mx-auto px-6 py-24">
+<section id="oferta" class="max-w-7xl mx-auto px-6 py-24 section-reveal">
   <div class="text-center mb-16">
     <p class="section-label mb-4">Oferta</p>
     <h2 class="section-title">Co znajdziesz<br/><span style="color: #f0c040;">u nas</span></h2>
@@ -689,7 +954,7 @@
      + gradient tła adekwatny do każdej karty
      + efekt holo rainbow podążający za myszką
 ══════════════════════════════════════════ -->
-<section id="produkty" class="max-w-7xl mx-auto px-6 py-24">
+<section id="produkty" class="max-w-7xl mx-auto px-6 py-24 section-reveal">
   <div class="text-center mb-10 reveal">
     <p class="section-label mb-4">Przykładowe karty</p>
     <h2 class="section-title">Wyróżnione<br/><span style="color: #f0c040;">perełki kolekcji</span></h2>
@@ -1147,7 +1412,7 @@
 <hr class="divider" />
 
 <!-- ── NADCHODZĄCE SETY ── -->
-<section id="sety" class="max-w-7xl mx-auto px-6 py-20">
+<section id="sety" class="max-w-7xl mx-auto px-6 py-20 section-reveal">
   <div class="p-10 md:p-14" style="background:#0f1526; border-radius:20px;">
     <div class="text-center mb-10">
       <p class="section-label mb-3">Na radarze</p>
@@ -1250,7 +1515,7 @@
 
 <!-- ── FAQ ── -->
 <section id="faq" class="max-w-3xl mx-auto px-6 py-24"
-  x-data="{ open: null, toggle(i) { this.open = this.open === i ? null : i; } }">
+  x-data="{ open: null, toggle(i) { this.open = this.open === i ? null : i; } }" class="section-reveal">
   <div class="text-center mb-14">
     <p class="section-label mb-4">FAQ</p>
     <h2 class="section-title">Często zadawane<br/><span style="color: #f0c040;">pytania</span></h2>
@@ -1284,7 +1549,7 @@
 <hr class="divider" />
 
 <!-- ── KONTAKT ── -->
-<section id="kontakt" class="max-w-7xl mx-auto px-6 py-24">
+<section id="kontakt" class="max-w-7xl mx-auto px-6 py-24 section-reveal">
   <div class="text-center mb-16">
     <p class="section-label mb-4">Kontakt</p>
     <h2 class="section-title">Napisz do nas,<br/><span style="color: #f0c040;">czekamy</span></h2>
@@ -1427,6 +1692,41 @@
     if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
+  /* ── 0a. Parallax – karta hero obraca się za myszką ── */
+  const heroCard = document.getElementById('hero-holo-card');
+  const heroSection = document.getElementById('hero');
+
+  if (heroCard && heroSection) {
+    heroSection.addEventListener('mousemove', (e) => {
+      const rect = heroCard.getBoundingClientRect();
+      /* Środek karty */
+      const cx = rect.left + rect.width  / 2;
+      const cy = rect.top  + rect.height / 2;
+      /* Odległość myszy od środka karty (-1 do 1) */
+      const dx = (e.clientX - cx) / (window.innerWidth  / 2);
+      const dy = (e.clientY - cy) / (window.innerHeight / 2);
+      /* Max 15 stopni */
+      const rotX = -dy * 15;
+      const rotY =  dx * 15;
+
+      heroCard.classList.add('is-tilting');
+      heroCard.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-8px)`;
+
+      /* Przesuń rainbow w kierunku myszy */
+      const rx = 50 + dx * 30;
+      const ry = 50 + dy * 30;
+      const rainbow = document.getElementById('hero-rainbow');
+      if (rainbow) rainbow.style.backgroundPosition = `${rx}% ${ry}%`;
+    });
+
+    heroSection.addEventListener('mouseleave', () => {
+      heroCard.classList.remove('is-tilting');
+      heroCard.style.transform = '';
+      heroCard.style.transition = 'transform 0.6s ease-out';
+      setTimeout(() => { heroCard.style.transition = ''; }, 600);
+    });
+  }
+
   /* ── 0. Formspree – obsługa wysyłki formularza ── */
   async function handleFormSubmit(event) {
     event.preventDefault();
@@ -1525,6 +1825,20 @@
   }, { passive: true });
 
   /* ── 4. Scroll-reveal – Intersection Observer ── */
+
+  /* 4a. Sekcje – fade in + slide up */
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        sectionObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.section-reveal').forEach(el => sectionObserver.observe(el));
+
+  /* 4b. Elementy wewnątrz sekcji (category cards, filtry) */
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -1532,9 +1846,48 @@
         revealObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.12 });
+  }, { threshold: 0.1, rootMargin: '0px 0px -20px 0px' });
 
   document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  /* 4c. Karty produktów – stagger effect (0.1s między kartami) */
+  const cardObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        /* Pobierz indeks karty w gridzie */
+        const grid = document.getElementById('products-grid');
+        const cards = Array.from(grid.querySelectorAll('.product-card:not(.hidden-card)'));
+        const idx = cards.indexOf(entry.target);
+        const delay = Math.max(0, idx * 0.08); /* 0.08s między kartami */
+
+        setTimeout(() => {
+          entry.target.classList.add('card-visible');
+        }, delay * 1000);
+
+        cardObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.05, rootMargin: '0px 0px -10px 0px' });
+
+  document.querySelectorAll('.product-card').forEach(card => cardObserver.observe(card));
+
+  /* 4d. Po filtrowaniu — re-animuj widoczne karty ze stagger */
+  const originalFilterCards = filterCards;
+  window.filterCards = function(filter) {
+    /* Wywołaj oryginalną funkcję */
+    originalFilterCards(filter);
+
+    /* Re-animuj karty po filtrze */
+    const grid = document.getElementById('products-grid');
+    const visibleCards = Array.from(grid.querySelectorAll('.product-card:not(.hidden-card)'));
+
+    visibleCards.forEach((card, idx) => {
+      card.classList.remove('card-visible');
+      setTimeout(() => {
+        card.classList.add('card-visible');
+      }, idx * 80);
+    });
+  };
 
   /* ── 5. Licznik z animacją flip cyfr ── */
   const target = new Date('2026-11-20T10:00:00');
