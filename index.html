@@ -439,56 +439,90 @@
     .holo-frame    { z-index: 5; }
     .holo-sparkle  { z-index: 6; }
     /* Tęczowa warstwa holo */
+    /* ─── HOLO warstwa 1: tęcza po skosie – naturalne widmo ─── */
     .holo-rainbow {
       position: absolute; inset: 0;
       border-radius: 14px;
       pointer-events: none;
       opacity: 0;
-      mix-blend-mode: color-dodge;
+      transition: opacity .3s;
+      /* Wąski pasek widma przechodzi przez całą kartę */
       background: linear-gradient(
-        115deg,
-        transparent        18%,
-        rgba(255,0,120,.45) 26%,
-        rgba(255,140,0,.45) 33%,
-        rgba(255,220,0,.45) 40%,
-        rgba(0,220,80, .45) 47%,
-        rgba(0,160,255,.45) 54%,
-        rgba(140,0,255,.45) 61%,
-        rgba(220,0,180,.45) 68%,
-        transparent        76%
+        var(--holo-angle, 135deg),
+        transparent          0%,
+        transparent          30%,
+        rgba(255,50, 120,.18) 36%,
+        rgba(255,140,  0,.22) 40%,
+        rgba(255,230,  0,.22) 44%,
+        rgba( 80,220, 80,.20) 48%,
+        rgba(  0,180,255,.22) 52%,
+        rgba(120,  0,255,.20) 56%,
+        rgba(220,  0,180,.18) 60%,
+        transparent          66%,
+        transparent         100%
       );
-      background-size: 200% 200%;
-      transition: opacity .25s;
+      background-size: 100% 100%;
+      mix-blend-mode: color-dodge;
     }
-    /* Shimmer linie */
+
+    /* ─── HOLO warstwa 2: subtelny metaliczny połysk ─── */
     .holo-shimmer {
       position: absolute; inset: 0;
       border-radius: 14px;
       pointer-events: none;
       opacity: 0;
-      mix-blend-mode: screen;
-      transition: opacity .25s;
-      background: repeating-linear-gradient(
-        var(--sh-angle, 45deg),
-        transparent 0px, transparent 2px,
-        rgba(255,255,255,.045) 2px, rgba(255,255,255,.045) 3px
-      );
+      transition: opacity .3s;
+      /* Cienkie linie pod kątem – jak prawdziwa folia holo */
+      background:
+        repeating-linear-gradient(
+          var(--sh-angle, 45deg),
+          transparent           0px,
+          transparent           3px,
+          rgba(255,255,255,.03) 3px,
+          rgba(255,255,255,.03) 4px
+        ),
+        repeating-linear-gradient(
+          calc(var(--sh-angle, 45deg) + 90deg),
+          transparent           0px,
+          transparent           8px,
+          rgba(255,255,255,.02) 8px,
+          rgba(255,255,255,.02) 9px
+        );
+      mix-blend-mode: overlay;
     }
-    /* Glare blask */
+
+    /* ─── HOLO warstwa 3: glare – blask od strony światła ─── */
     .holo-glare {
       position: absolute; inset: 0;
       border-radius: 14px;
       pointer-events: none;
       opacity: 0;
-      mix-blend-mode: screen;
-      transition: opacity .25s;
+      transition: opacity .3s;
       background: radial-gradient(
-        ellipse 65% 65% at var(--gx,50%) var(--gy,50%),
-        rgba(255,255,255,.28) 0%,
-        rgba(255,255,255,.07) 45%,
-        transparent 70%
+        ellipse 55% 70% at var(--gx,50%) var(--gy,0%),
+        rgba(255,255,255,.22) 0%,
+        rgba(255,255,255,.06) 40%,
+        transparent           70%
       );
+      mix-blend-mode: soft-light;
     }
+
+    /* ─── HOLO warstwa 4: głęboki cień z kolorem ─── */
+    .holo-depth {
+      position: absolute; inset: 0;
+      border-radius: 14px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .3s;
+      z-index: 1;
+      background: radial-gradient(
+        ellipse 80% 80% at var(--dgx,50%) var(--dgy,50%),
+        transparent 40%,
+        rgba(0,0,20,.25) 100%
+      );
+      mix-blend-mode: multiply;
+    }
+
     /* Złota ramka */
     .holo-frame {
       position: absolute; inset: 0;
@@ -648,8 +682,8 @@
     /* Stagger karty produktów */
     .product-card {
       opacity: 0;
-      transform: translateY(24px);
-      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+      transform: translateY(20px);
+      transition: opacity 0.55s ease-out, transform 0.55s ease-out;
     }
     .product-card.card-visible {
       opacity: 1;
@@ -798,6 +832,7 @@
               <div class="holo-rainbow" id="holo-rainbow"></div>
               <div class="holo-shimmer" id="holo-shimmer"></div>
               <div class="holo-glare"   id="holo-glare"></div>
+              <div class="holo-depth"   id="holo-depth"></div>
               <div class="holo-frame"   id="holo-frame"></div>
             </div>
           </div>
@@ -1682,6 +1717,7 @@
     const rainbow = document.getElementById('holo-rainbow');
     const shimmer = document.getElementById('holo-shimmer');
     const glare   = document.getElementById('holo-glare');
+    const depth   = document.getElementById('holo-depth');
     const frame   = document.getElementById('holo-frame');
     const hero    = document.getElementById('hero');
     if (!card) return;
@@ -1706,9 +1742,10 @@
     if (isMobile) {
       /* Mobile: auto-tilt + zawsze widoczny efekt holo */
       card.classList.add('auto-tilt');
-      rainbow.style.opacity = '0.65';
-      shimmer.style.opacity = '0.45';
-      glare.style.opacity   = '0.3';
+      rainbow.style.opacity = '0.55';
+      shimmer.style.opacity = '0.40';
+      glare.style.opacity   = '0.35';
+      if (depth) depth.style.opacity = '0.25';
       sparks.forEach(s => s.style.opacity = ''); /* animacja CSS */
       return;
     }
@@ -1728,7 +1765,12 @@
     }
     raf = requestAnimationFrame(tick);
 
-    document.addEventListener('mousemove', (e) => {
+    /* Listener tylko na obszarze karty — nie cały hero */
+    /* Listener na całej sekcji hero – z falloff im dalej od karty */
+    const heroSection = document.getElementById('hero');
+    const listenEl = heroSection || document;
+
+    listenEl.addEventListener('mousemove', (e) => {
       /* Pozycja myszy względem CENTRUM KARTY — precyzyjne śledzenie */
       const rect = card.getBoundingClientRect();
       const cx = rect.left + rect.width  / 2;
@@ -1738,27 +1780,35 @@
       const dx = (e.clientX - cx) / (rect.width  * 0.5);
       const dy = (e.clientY - cy) / (rect.height * 0.5);
 
-      /* Ogranicz do max 1 (poza kartą większe odchylenie tłumimy) */
-      const clampedDX = Math.max(-1.4, Math.min(1.4, dx));
-      const clampedDY = Math.max(-1.4, Math.min(1.4, dy));
+      /* Clamp z zapasem — obszar wokół karty też reaguje */
+      const clampedDX = Math.max(-2.5, Math.min(2.5, dx));
+      const clampedDY = Math.max(-2.5, Math.min(2.5, dy));
 
-      /* Max 25 stopni */
-      tRY =  clampedDX * 25;
-      tRX = -clampedDY * 25;
+      /* Falloff – pełny efekt na karcie, stopniowo maleje w obszarze wokół */
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      const falloff = Math.max(0, 1 - Math.max(0, dist - 1) * 0.35);
+      tRY =  clampedDX * 25 * falloff;
+      tRX = -clampedDY * 25 * falloff;
 
-      /* Rainbow background-position zależnie od kąta */
-      const bx = 50 + clampedDX * 45;
-      const by = 50 + clampedDY * 45;
-      rainbow.style.backgroundPosition = bx + '% ' + by + '%';
+      /* Kąt gradientu tęczy – obraca się z ruchem myszy jak folia */
+      const holoAngle = 135 + clampedDX * 25 + clampedDY * 15;
+      rainbow.style.setProperty('--holo-angle', holoAngle + 'deg');
 
-      /* Kąt shimmer liniacji */
-      shimmer.style.setProperty('--sh-angle', (45 + clampedDX * 35 + clampedDY * 20) + 'deg');
+      /* Kąt shimmer – siatka liniacji */
+      const shAngle = 45 + clampedDX * 40 + clampedDY * 25;
+      shimmer.style.setProperty('--sh-angle', shAngle + 'deg');
 
-      /* Glare od strony pochylenia */
-      glare.style.setProperty('--gx', (50 + clampedDX * 48) + '%');
-      glare.style.setProperty('--gy', (50 + clampedDY * 48) + '%');
+      /* Glare – blask od strony pochylenia, wyżej gdy karta odchylona do tyłu */
+      const gx = 50 + clampedDX * 45;
+      const gy = 20 + clampedDY * 40;  /* wyżej na karcie dla naturalności */
+      glare.style.setProperty('--gx', gx + '%');
+      glare.style.setProperty('--gy', gy + '%');
 
-      /* Dynamiczny złoty box-shadow w kierunku pochylenia */
+      /* Depth – cień po przeciwnej stronie niż światło */
+      depth.style.setProperty('--dgx', (50 - clampedDX * 40) + '%');
+      depth.style.setProperty('--dgy', (50 - clampedDY * 40) + '%');
+
+      /* Dynamiczny złoty box-shadow */
       const glow = Math.min(1, Math.sqrt(clampedDX*clampedDX + clampedDY*clampedDY) * 1.1);
       const sx = -clampedDX * 35;
       const sy = -clampedDY * 35;
@@ -1768,15 +1818,16 @@
         (sx*0.4) + 'px ' + (sy*0.4) + 'px ' + (70 + glow*50) + 'px rgba(240,192,64,' + (0.1 + glow*0.2) + ')'
       ].join(', ');
 
-      /* Intensywność efektów */
-      const ints = 0.25 + glow * 0.7;
-      rainbow.style.opacity = Math.min(0.9, ints).toString();
-      shimmer.style.opacity = Math.min(0.7, ints * 0.75).toString();
-      glare.style.opacity   = Math.min(0.8, ints * 0.85).toString();
+      /* Intensywność – subtelniejsza, narasta płynniej */
+      const ints = Math.pow(glow, 0.7) * 0.85;
+      rainbow.style.opacity = Math.min(0.75, ints).toString();
+      shimmer.style.opacity = Math.min(0.60, ints * 0.8).toString();
+      glare.style.opacity   = Math.min(0.70, ints * 0.9).toString();
+      depth.style.opacity   = Math.min(0.50, ints * 0.6).toString();
 
       /* Sparkle — aktywuj te bliskie pozycji "blasku" */
-      const glareX = 0.5 + clampedDX * 0.48;
-      const glareY = 0.5 + clampedDY * 0.48;
+      const glareX = 0.5 + clampedDX * 0.45;
+      const glareY = 0.2 + clampedDY * 0.40;
       sparks.forEach(s => {
         const sl = parseFloat(s.style.left) / 100;
         const st = parseFloat(s.style.top)  / 100;
@@ -1787,11 +1838,12 @@
       });
     });
 
-    document.addEventListener('mouseleave', () => {
+    listenEl.addEventListener('mouseleave', () => {
       tRX = 0; tRY = 0;
       rainbow.style.opacity = '0';
       shimmer.style.opacity = '0';
       glare.style.opacity   = '0';
+      if (depth) depth.style.opacity = '0';
       frame.style.boxShadow = 'inset 0 0 0 2px rgba(200,144,10,.4), 0 20px 60px rgba(0,0,0,.7)';
       sparks.forEach(s => { s.style.animationPlayState = 'paused'; s.style.opacity = '0'; });
     });
@@ -1928,7 +1980,7 @@
         const grid = document.getElementById('products-grid');
         const cards = Array.from(grid.querySelectorAll('.product-card:not(.hidden-card)'));
         const idx = cards.indexOf(entry.target);
-        const delay = Math.max(0, idx * 0.08); /* 0.08s między kartami */
+        const delay = Math.max(0, idx * 0.075); /* 0.075s między kartami */
 
         setTimeout(() => {
           entry.target.classList.add('card-visible');
@@ -1955,7 +2007,7 @@
       card.classList.remove('card-visible');
       setTimeout(() => {
         card.classList.add('card-visible');
-      }, idx * 80);
+      }, idx * 75);
     });
   };
 
