@@ -22,7 +22,7 @@ https://pokeshop-landing.vercel.app/
 ## 📸 Screenshots
 
 ### Homepage
-![Uploading image.png…]()
+![Homepage](./assets/homepage.png)
 
 
 ### Mobile View
