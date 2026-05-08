@@ -723,6 +723,22 @@
     /* ── Gradient border na category card hover ── */
     .category-card { position: relative; overflow: visible; }
   </style>
+  <!-- =============================================
+       GOOGLE ANALYTICS 4
+       Zamień G-VZ2593L9B6 na swój Measurement ID
+       Instrukcja: patrz komentarz na dole pliku
+  ============================================= -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VZ2593L9B6"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-VZ2593L9B6', {
+      page_title: 'PokeLovers Gdynia – Landing Page',
+      page_location: window.location.href,
+    });
+  </script>
+
 </head>
 
 <body x-data="{
@@ -811,7 +827,8 @@
 
         <!-- CTA -->
         <div class="fade-up delay-5 flex flex-wrap gap-4 mt-8">
-          <a href="#sety" class="btn-gold btn-pulse">
+          <a href="#sety" class="btn-gold btn-pulse"
+               onclick="gtag('event','click_zapisz_otwarcie',{event_category:'CTA',event_label:'Hero – Zapisz się na otwarcie'})">
             <span class="btn-svg"><i data-lucide="bell"></i></span> Zapisz się na otwarcie
           </a>
           <a href="#produkty" class="btn-outline">
@@ -1628,8 +1645,8 @@
       <div class="category-card" style="padding:1.5rem;">
         <h3 style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;color:#e8eaf0;margin-bottom:1rem;">Śledź nas</h3>
         <div class="flex gap-3">
-          <a href="https://instagram.com" target="_blank" class="btn-outline" style="flex:1;justify-content:center;padding:10px;font-size:12px;gap:6px;"><span class="social-svg"><i data-lucide="instagram"></i></span> Instagram</a>
-          <a href="https://facebook.com" target="_blank" class="btn-outline" style="flex:1;justify-content:center;padding:10px;font-size:12px;gap:6px;"><span class="social-svg"><i data-lucide="facebook"></i></span> Facebook</a>
+          <a href="https://instagram.com" target="_blank" class="btn-outline" style="flex:1;justify-content:center;padding:10px;font-size:12px;gap:6px;" onclick="gtag('event','click_social',{event_category:'Social Media',event_label:'Instagram'})"><span class="social-svg"><i data-lucide="instagram"></i></span> Instagram</a>
+          <a href="https://facebook.com" target="_blank" class="btn-outline" style="flex:1;justify-content:center;padding:10px;font-size:12px;gap:6px;" onclick="gtag('event','click_social',{event_category:'Social Media',event_label:'Facebook'})"><span class="social-svg"><i data-lucide="facebook"></i></span> Facebook</a>
         </div>
       </div>
       <div style="border-radius:16px;overflow:hidden;border:1px solid rgba(240,192,64,0.15);aspect-ratio:16/9;background:rgba(20,28,51,0.8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
@@ -1667,9 +1684,9 @@
           <p style="font-size:0.88rem;color:#6b7a99;">ul. Nożownicza 67-69, 81-420 Gdynia</p>
         </div>
         <div class="flex gap-3 mt-4">
-          <a href="https://instagram.com" target="_blank" class="nav-link" style="font-size:12px;">Instagram</a>
+          <a href="https://instagram.com" target="_blank" class="nav-link" style="font-size:12px;" onclick="gtag('event','click_social',{event_category:'Social Media',event_label:'Instagram – Stopka'})">Instagram</a>
           <span style="color:#3a4566;">·</span>
-          <a href="https://facebook.com" target="_blank" class="nav-link" style="font-size:12px;">Facebook</a>
+          <a href="https://facebook.com" target="_blank" class="nav-link" style="font-size:12px;" onclick="gtag('event','click_social',{event_category:'Social Media',event_label:'Facebook – Stopka'})">Facebook</a>
         </div>
       </div>
     </div>
@@ -1879,6 +1896,13 @@
         btn.style.background = '';
         btn.style.opacity = '1';
         btn.disabled = false;
+        /* GA4 event – wysłanie formularza */
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'form_submit_kontakt', {
+            event_category: 'Formularz',
+            event_label: 'Formularz kontaktowy – sukces',
+          });
+        }
       } else {
         throw new Error('Błąd serwera');
       }
@@ -2095,6 +2119,25 @@
     drawParticles();
   }
 
+  /* ── 6b. Tracking kliknięć "Zarezerwuj" na kartach produktów ── */
+  document.getElementById('products-grid')?.addEventListener('click', function(e) {
+    const btn = e.target.closest('.btn-gold');
+    if (!btn) return;
+    /* Znajdź nazwę karty – p wewnątrz card-info-grad */
+    const card = btn.closest('.product-card');
+    if (!card) return;
+    const nameEl = card.querySelector('.card-info-grad p:first-child');
+    const cardName = nameEl ? nameEl.textContent.trim() : 'Nieznana karta';
+    /* GA4 event */
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'click_zarezerwuj_karte', {
+        event_category: 'Produkty',
+        event_label: cardName,
+        card_name: cardName,
+      });
+    }
+  });
+
   /* ── 7. Reveal klasy na sekcje – dodajemy przez JS ── */
   document.querySelectorAll('section > .text-center').forEach(el => {
     el.classList.add('reveal');
@@ -2102,4 +2145,57 @@
 </script>
 
 </body>
+
+<!-- =============================================
+  INSTRUKCJA GOOGLE ANALYTICS 4
+  =============================================
+
+  KROK 1 – Załóż konto Google Analytics
+  ───────────────────────────────────────
+  1. Wejdź na: https://analytics.google.com
+  2. Kliknij "Rozpocznij pomiar"
+  3. Wpisz nazwę konta np. "PokeLovers"
+  4. Kliknij "Dalej"
+
+  KROK 2 – Utwórz właściwość (Property)
+  ───────────────────────────────────────
+  1. Nazwa właściwości: "PokeLovers Landing Page"
+  2. Strefa czasowa: Polska (UTC+1)
+  3. Waluta: PLN
+  4. Kliknij "Dalej" → podaj branżę (Retail) → "Utwórz"
+
+  KROK 3 – Uzyskaj Measurement ID
+  ───────────────────────────────────────
+  1. Po utworzeniu kliknij "Strumień danych" → "Sieć"
+  2. Wpisz URL strony i jej nazwę
+  3. Kliknij "Utwórz strumień"
+  4. Skopiuj Measurement ID (format: G-VZ2593L9B6)
+
+  KROK 4 – Wklej ID do pliku
+  ───────────────────────────────────────
+  Znajdź w tym pliku (Ctrl+F): G-VZ2593L9B6
+  Są dwa miejsca – zastąp oba swoim ID np. G-ABC123DEF4
+
+  KROK 5 – Zweryfikuj że działa
+  ───────────────────────────────────────
+  1. Otwórz stronę w przeglądarce
+  2. W Google Analytics wejdź: Raporty → Czas rzeczywisty
+  3. Powinieneś widzieć "1 aktywny użytkownik"
+  4. Kliknij "Zarezerwuj" przy karcie – zobaczysz event
+     "click_zarezerwuj_karte" w czasie rzeczywistym
+
+  ŚLEDZONE EVENTY
+  ───────────────────────────────────────
+  • click_zarezerwuj_karte  – kliknięcie Zarezerwuj przy karcie
+                               (parametr: card_name = nazwa karty)
+  • click_zapisz_otwarcie   – kliknięcie "Zapisz się na otwarcie"
+  • form_submit_kontakt     – wysłanie formularza kontaktowego
+  • click_social            – kliknięcie Instagram / Facebook
+                               (parametr: event_label = nazwa platformy)
+
+  GDZIE ZOBACZYĆ EVENTY
+  ───────────────────────────────────────
+  Analytics → Raporty → Aktywność → Zdarzenia
+  Lub: Eksploruj → Eksploracja zdarzeń
+============================================= -->
 </html>
