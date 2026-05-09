@@ -1994,13 +1994,11 @@
         headers: { 'Accept': 'application/json' },
       });
 
-      /* 2. Zapisz do Supabase (nawet jeśli Formspree zawiedzie) */
-      if (SUPABASE_URL !== 'https://exqsahakhoonrlqhphdg.supabase.co') {
-        const { error: dbError } = await sbClient
-          .from('inquiries')
-          .insert([inquiry]);
-        if (dbError) console.warn('Supabase insert error:', dbError.message);
-      }
+      /* 2. Zapisz do Supabase */
+      const { error: dbError } = await sbClient
+        .from('inquiries')
+        .insert([inquiry]);
+      if (dbError) console.warn('Supabase insert error:', dbError.message);
 
       if (formspreeRes.ok) {
         success.style.display = 'block';
