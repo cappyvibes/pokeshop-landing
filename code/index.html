@@ -12,6 +12,9 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- Supabase JS SDK – zapis zapytań do bazy -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <!-- Lucide Icons – wektorowe SVG zamiast emoji -->
   <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
 
@@ -1948,7 +1951,17 @@
     }
   }
 
-  /* ── 0. Formspree – obsługa wysyłki formularza ── */
+  /* ═══════════════════════════════════════════════════
+     SUPABASE – konfiguracja
+     Podmień na swoje klucze z:
+     Supabase → Settings → API
+  ═══════════════════════════════════════════════════ */
+  const SUPABASE_URL      = 'https://exqsahakhoonrlqhphdg.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4cXNhaGFraG9vbnJscWhwaGRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDIzMzYsImV4cCI6MjA5Mzg3ODMzNn0.rAURIDEfnc4ZrbRI-QyaHnvYRmlU7w0UibYquleMyrA';
+  const { createClient } = supabase;
+  const sbClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  /* ── Formularz kontaktowy – Formspree + zapis do Supabase ── */
   async function handleFormSubmit(event) {
     event.preventDefault();
     const form    = document.getElementById('contact-form');
@@ -1956,44 +1969,61 @@
     const success = document.getElementById('form-success');
     const error   = document.getElementById('form-error');
 
-    /* Stan ładowania */
-    btn.textContent = 'Wysyłanie...';
-    btn.disabled = true;
+    btn.textContent   = 'Wysyłanie...';
+    btn.disabled      = true;
     btn.style.opacity = '0.7';
     success.style.display = 'none';
     error.style.display   = 'none';
 
+    /* Zbierz dane z formularza */
+    const formData = new FormData(form);
+    const inquiry  = {
+      name:      formData.get('imie')      || '',
+      email:     formData.get('email')     || '',
+      subject:   formData.get('temat')     || '',
+      message:   formData.get('wiadomosc') || '',
+      card_name: null,  /* TODO: możesz tu dodać pole "karta" w formularzu */
+      status:    'new',
+    };
+
     try {
-      const response = await fetch(form.action, {
-        method: 'POST',
-        body: new FormData(form),
-        headers: { 'Accept': 'application/json' }
+      /* 1. Wyślij przez Formspree (email do właściciela) */
+      const formspreeRes = await fetch(form.action, {
+        method:  'POST',
+        body:    new FormData(form),
+        headers: { 'Accept': 'application/json' },
       });
 
-      if (response.ok) {
-        /* Sukces */
+      /* 2. Zapisz do Supabase (nawet jeśli Formspree zawiedzie) */
+      if (SUPABASE_URL !== 'https://exqsahakhoonrlqhphdg.supabase.co') {
+        const { error: dbError } = await sbClient
+          .from('inquiries')
+          .insert([inquiry]);
+        if (dbError) console.warn('Supabase insert error:', dbError.message);
+      }
+
+      if (formspreeRes.ok) {
         success.style.display = 'block';
         form.reset();
-        btn.textContent = 'Wyślij wiadomość →';
+        btn.textContent   = 'Wyślij wiadomość →';
         btn.style.background = '';
         btn.style.opacity = '1';
-        btn.disabled = false;
-        /* GA4 event – wysłanie formularza */
+        btn.disabled      = false;
+        /* GA4 */
         if (typeof gtag !== 'undefined') {
           gtag('event', 'form_submit_kontakt', {
             event_category: 'Formularz',
-            event_label: 'Formularz kontaktowy – sukces',
+            event_label:    'Formularz kontaktowy – sukces',
           });
         }
       } else {
         throw new Error('Błąd serwera');
       }
     } catch (err) {
-      /* Błąd */
-      error.style.display = 'block';
-      btn.textContent = 'Wyślij wiadomość →';
-      btn.style.opacity = '1';
-      btn.disabled = false;
+      error.style.display   = 'block';
+      btn.textContent       = 'Wyślij wiadomość →';
+      btn.style.opacity     = '1';
+      btn.disabled          = false;
     }
   }
 
