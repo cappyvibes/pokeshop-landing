@@ -1214,7 +1214,7 @@
     <!-- Mega Gardevoir ex -->
     <div class="product-card gold-card" data-filter="mhr" onmousemove="holoMove(event,this)" onmouseleave="holoLeave(this)">
       <div class="holo-border"></div>
-      <img class="card-full-img" src="https://cdn.jsdelivr.net/gh/cappyvibes/pokeshop-landing@main/mega-gardevoir-ex-187.png.webp" alt="Mega Gardevoir ex" loading="lazy" onerror="this.style.opacity='0.3'" />
+      <img class="card-full-img" src="https://cdn.jsdelivr.net/gh/cappyvibes/pokeshop-landing@main/assets/mega-gardevoir-ex-187.png.webp" alt="Mega Gardevoir ex" loading="lazy" onerror="this.style.opacity='0.3'" />
       <div class="holo-layer"></div>
       <div class="rainbow-layer"></div>
       <div class="glitter-layer"></div>
@@ -1539,10 +1539,29 @@
     </div>
     <div class="mt-10 max-w-md mx-auto text-center">
       <p class="mb-4" style="color:#8a9ab8;font-size:0.95rem;">Zapisz się — informujemy o premierach, preorderach i dostępności kart:</p>
-      <form onsubmit="event.preventDefault(); alert('Dziękujemy! Dodaliśmy Cię do listy.');" class="flex gap-3 flex-wrap justify-center">
-        <input type="email" placeholder="twoj@email.pl" class="form-input" style="flex:1;min-width:200px;" />
-        <button type="submit" class="btn-gold" style="white-space:nowrap;">Zapisz się</button>
+
+      <form id="newsletter-form" class="flex gap-3 flex-wrap justify-center"
+            onsubmit="handleNewsletterSubmit(event)">
+        <input type="email" id="newsletter-email" placeholder="twoj@email.pl"
+               class="form-input" style="flex:1;min-width:200px;" required />
+        <button type="submit" id="newsletter-btn" class="btn-gold" style="white-space:nowrap;">
+          Zapisz się
+        </button>
       </form>
+
+      <!-- Komunikat sukcesu -->
+      <div id="newsletter-success" style="display:none; margin-top:1rem; text-align:center;">
+        <p style="font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1rem; color:#5aba88;">
+          ✓ Zapisano! Sprawdź skrzynkę — wysłaliśmy potwierdzenie.
+        </p>
+      </div>
+
+      <!-- Komunikat błędu -->
+      <div id="newsletter-error" style="display:none; margin-top:1rem; text-align:center;">
+        <p style="font-size:0.85rem; color:#e05050;">
+          Coś poszło nie tak. Spróbuj ponownie lub napisz na kontakt@poke-lovers.pl
+        </p>
+      </div>
     </div>
   </div>
 </section>
@@ -1865,6 +1884,69 @@
       sparks.forEach(s => { s.style.animationPlayState = 'paused'; s.style.opacity = '0'; });
     });
   })();
+
+  /* ── MailerLite Newsletter – obsługa zapisu ── */
+  async function handleNewsletterSubmit(event) {
+    event.preventDefault();
+
+    const email   = document.getElementById('newsletter-email').value.trim();
+    const btn     = document.getElementById('newsletter-btn');
+    const success = document.getElementById('newsletter-success');
+    const error   = document.getElementById('newsletter-error');
+    const form    = document.getElementById('newsletter-form');
+
+    /* ─────────────────────────────────────────────────────
+       KONFIGURACJA MAILERLITE — podmień poniższe wartości:
+       1. TWOJ_API_KEY → MailerLite → Integrations → API
+                         → Generate new token
+       2. TWOJ_GROUP_ID → Subscribers → Groups → kliknij grupę
+                          → ID widoczne w URL (liczba)
+    ───────────────────────────────────────────────────── */
+    const MAILERLITE_API_KEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI0IiwianRpIjoiNTc3MWQ3Y2E5MGMyMzE4NDBiOGRiOTIyNTU3MjQ5OWFkZjgyMDk4ZTZjMWYxODUyZGQ2MTYyOWMyN2RkMjc4NzRiZGQ1ODg0NWIxZDcxMTQiLCJpYXQiOjE3NzgzMTc1NTEuNTUwNDY0LCJuYmYiOjE3NzgzMTc1NTEuNTUwNDY5LCJleHAiOjQ5MzM5OTExNTEuNTQ0NTgsInN1YiI6IjIzNTE2NDkiLCJzY29wZXMiOltdfQ.qYtOgkHrvMpUyhkUm6nsl2dR7-jFNdsTKmkg-levtkxPQsElqG4J8f1q0i1lruXlYVbf2bgViIZc_4zOrw1D4sUcxnqX1zqai3D_bjrHtBEUdYVDNbltFWboGuBpIXi5jWIqDY12Rj7VP9aiAJ_JODJVWaSKdpOvFT-zP761Fs7PsdWv26-RB9uUQDkT-CHBzqHsnjRyXy_rCtWBk77x5yVrlpmapP8M7KHflEvhOSU8T3TWMan8x2_sRvAjzOAgDYUv0pN18DgTFX2mW02cQ8YT1ah9Km4MDSx699JQGaGzaabd-R9Da9v7BKIu187E-zBcaSw2DdT0K3fg6BlELKAOFfCNIaOVfS9qNjuHBPljgmx5r9XkL9LODxUoDJqixnRYYE0ON2972fl1u0TTbbycgBNZMzCyppBc-3-9Rn_hhUV_HpnznrkuIzpMaVpiTX-UKhLKpkdj666d9V6KtariH1-qPM-J-EvQPuU_QJ2Xyolo_bWekeLTn6vsAHI53m9_4P1Um0AKyKjDC364uIbsurnciYFF0gmDfhIJPv7CSDGtJuFlqg1GB9shXVH2cptz8z7E7_6XGDHTnRr53Dywi8YCsaX31b0wz8XRptbCT2HoqJwPjAUc2ibjyhKlKv3Gps7uNVN-sDsB8qC-WWZVWcPR72WwWQ5BkWN2pSg';
+    const GROUP_ID           = '186978977879951113';
+
+    btn.textContent   = 'Zapisuję...';
+    btn.disabled      = true;
+    btn.style.opacity = '0.7';
+    success.style.display = 'none';
+    error.style.display   = 'none';
+
+    try {
+      const response = await fetch('https://connect.mailerlite.com/api/subscribers', {
+        method: 'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'Accept':        'application/json',
+          'Authorization': 'Bearer ' + MAILERLITE_API_KEY,
+        },
+        body: JSON.stringify({
+          email:  email,
+          groups: [GROUP_ID],
+          fields: { city: 'Gdynia – Landing Page' },
+          status: 'active',
+        }),
+      });
+
+      if (response.ok) {
+        form.style.display    = 'none';
+        success.style.display = 'block';
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'newsletter_signup', {
+            event_category: 'Newsletter',
+            event_label:    'PokeLovers Waitlist',
+          });
+        }
+      } else {
+        throw new Error('Błąd API: ' + response.status);
+      }
+    } catch (err) {
+      console.error('Newsletter error:', err);
+      error.style.display   = 'block';
+      btn.textContent       = 'Zapisz się';
+      btn.disabled          = false;
+      btn.style.opacity     = '1';
+    }
+  }
 
   /* ── 0. Formspree – obsługa wysyłki formularza ── */
   async function handleFormSubmit(event) {
