@@ -658,35 +658,49 @@
     /* ── Scroll-reveal – fade in + slide up ── */
     .reveal {
       opacity: 0;
-      transform: translateY(32px);
-      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+      transform: translateY(20px);
+      transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: opacity, transform;
     }
     .reveal.visible {
       opacity: 1;
       transform: translateY(0);
     }
-    /* Opóźnienia dla kart kategorii */
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.2s; }
-    .reveal-delay-3 { transition-delay: 0.3s; }
-    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-1 { transition-delay: 0.08s; }
+    .reveal-delay-2 { transition-delay: 0.16s; }
+    .reveal-delay-3 { transition-delay: 0.24s; }
+    .reveal-delay-4 { transition-delay: 0.32s; }
 
     /* Animacja sekcji – subtelniejsza */
+    /* Płynne wejście sekcji – zoptymalizowane dla PC i mobile */
     .section-reveal {
       opacity: 0;
-      transform: translateY(24px);
-      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+      transform: translateY(20px);
+      transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: opacity, transform;
     }
     .section-reveal.visible {
       opacity: 1;
       transform: translateY(0);
     }
+    /* Wyłącz animacje dla użytkowników którzy wolą mniej ruchu */
+    @media (prefers-reduced-motion: reduce) {
+      .section-reveal, .reveal, .product-card {
+        transition: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    }
 
     /* Stagger karty produktów */
     .product-card {
       opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.55s ease-out, transform 0.55s ease-out;
+      transform: translateY(22px);
+      transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: opacity, transform;
     }
     .product-card.card-visible {
       opacity: 1;
@@ -1251,14 +1265,14 @@
     <!-- Greninja ex -->
     <div class="product-card" data-filter="sir" onmousemove="holoMove(event,this)" onmouseleave="holoLeave(this)">
       <div class="holo-border"></div>
-      <img class="card-full-img" src="https://images.pokemontcg.io/sv6/202_hires.png" alt="Greninja ex" loading="lazy" onerror="this.style.opacity='0.2'" />
+      <img class="card-full-img" src="https://den-cards.pokellector.com/392/Greninja-ex.TWM.214.52862.png" alt="Greninja ex" loading="lazy" onerror="this.style.opacity='0.2'" />
       <div class="holo-layer"></div>
       <div class="rainbow-layer"></div>
       <div class="glitter-layer"></div>
       <span class="rarity-badge sir">SIR</span>
       <div class="card-info-grad">
         <p style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:1px;">Greninja ex</p>
-        <p style="font-size:0.72rem;color:rgba(255,255,255,0.5);font-family:'Space Mono',monospace;margin-bottom:0.6rem;">Twilight Masquerade #202</p>
+        <p style="font-size:0.72rem;color:rgba(255,255,255,0.5);font-family:'Space Mono',monospace;margin-bottom:0.6rem;">Twilight Masquerade #214</p>
         <div class="flex items-center justify-between gap-2">
           <span style="font-family:'Space Mono',monospace;font-size:0.85rem;color:#f0c040;font-weight:700;">~450 zł</span>
           <a href="#kontakt" class="btn-gold" style="padding:6px 10px;font-size:9px;gap:3px;"><i data-lucide="bookmark" style="width:11px;height:11px;stroke:currentColor;fill:none;"></i> Zarezerwuj</a>
@@ -2083,6 +2097,10 @@
   /* ── 4. Scroll-reveal – Intersection Observer ── */
 
   /* 4a. Sekcje – fade in + slide up */
+  /* Threshold 0 = reaguje od razu gdy element wchodzi w viewport
+     rootMargin ujemny = czekaj aż element jest trochę bardziej widoczny
+     Na mobile mniejszy rootMargin bo ekran mniejszy */
+  const isMobileDevice = window.innerWidth < 768;
   const sectionObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -2090,7 +2108,10 @@
         sectionObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  }, {
+    threshold: 0.05,
+    rootMargin: isMobileDevice ? '0px 0px -20px 0px' : '0px 0px -50px 0px'
+  });
 
   document.querySelectorAll('.section-reveal').forEach(el => sectionObserver.observe(el));
 
@@ -2102,7 +2123,10 @@
         revealObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -20px 0px' });
+  }, {
+    threshold: 0.05,
+    rootMargin: isMobileDevice ? '0px 0px -10px 0px' : '0px 0px -20px 0px'
+  });
 
   document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
@@ -2110,38 +2134,39 @@
   const cardObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        /* Pobierz indeks karty w gridzie */
         const grid = document.getElementById('products-grid');
         const cards = Array.from(grid.querySelectorAll('.product-card:not(.hidden-card)'));
         const idx = cards.indexOf(entry.target);
-        const delay = Math.max(0, idx * 0.075); /* 0.075s między kartami */
-
+        /* Mniejszy stagger na mobile – nie czekaj za długo */
+        const stagger = isMobileDevice ? 0.05 : 0.075;
+        const delay = Math.max(0, idx * stagger);
         setTimeout(() => {
           entry.target.classList.add('card-visible');
         }, delay * 1000);
-
         cardObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.05, rootMargin: '0px 0px -10px 0px' });
+  }, {
+    threshold: 0.04,
+    rootMargin: isMobileDevice ? '0px 0px 0px 0px' : '0px 0px -10px 0px'
+  });
 
   document.querySelectorAll('.product-card').forEach(card => cardObserver.observe(card));
 
   /* 4d. Po filtrowaniu — re-animuj widoczne karty ze stagger */
   const originalFilterCards = filterCards;
   window.filterCards = function(filter) {
-    /* Wywołaj oryginalną funkcję */
     originalFilterCards(filter);
 
-    /* Re-animuj karty po filtrze */
     const grid = document.getElementById('products-grid');
     const visibleCards = Array.from(grid.querySelectorAll('.product-card:not(.hidden-card)'));
+    const staggerMs = isMobileDevice ? 45 : 70;
 
     visibleCards.forEach((card, idx) => {
       card.classList.remove('card-visible');
       setTimeout(() => {
         card.classList.add('card-visible');
-      }, idx * 75);
+      }, idx * staggerMs);
     });
   };
 
