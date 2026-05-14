@@ -26,7 +26,7 @@ https://pokeshop-landing.vercel.app/
 
 
 ### Mobile View
-(Add screenshot here)
+![Homepage](./assets/mobile.png)
 
 ## 📦 Installation
 
